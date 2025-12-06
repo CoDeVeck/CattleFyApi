@@ -6,7 +6,7 @@ COPY /.mvn .mvn
 COPY mvnw pom.xml ./
 
 RUN chmod +x mvnw
-RUN ./mvnw dependecy:go-offline
+RUN ./mvnw dependency:go-offline
 
 COPY src ./src
 RUN ./mvnw clean package -DeskipTests
