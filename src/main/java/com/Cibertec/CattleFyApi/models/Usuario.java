@@ -14,9 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 public class Usuario {
 
-	
-	
-	 @Id
+        @Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    @Column(name = "usuario_id")
 	    private Integer usuarioId;
