@@ -7,7 +7,9 @@ import com.Cibertec.CattleFyApi.models.Usuario;
 import java.util.Optional;
 
 public interface IUsuarioRepository  extends JpaRepository<Usuario, Integer>{
-
+    Optional<Usuario> findByFirebaseUid(String firebaseUid);
+    boolean existsByEmail(String email);
+    boolean existsByDocumento(String documento);
 
     Optional<Usuario> findByEmail(String correoUsuario);
     Optional<Usuario> findByTelefono(String telefonoUsu);

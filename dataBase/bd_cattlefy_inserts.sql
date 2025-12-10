@@ -3,10 +3,11 @@ INSERT INTO tb_rol (descripcion) VALUES
 ('Productor'),
 ('Veterinario');
 
-INSERT INTO tb_usuarios 
+/*INSERT INTO tb_usuarios eliminado por motivo de que se necesita el campo uuid
 (nombres, ape_pat, ape_mat, documento, email, contra, telefono, imagen_url, rol_id)
 VALUES
 ('Carlos', 'Ramirez', 'Lopez', '12345678', 'carlos.admin@example.com', 'pass123', '987654321', NULL, 1),  -- Administrador
+*/
 
 ('María', 'Torres', 'Sanchez', '87654321', 'maria.productor@example.com', 'pass456', '912345678', NULL, 2), -- Productor
 

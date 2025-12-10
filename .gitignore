@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Spring Boot profiles
+application-dev.properties
+application-*.properties
+
+# Firebase service account keys
+src/main/resources/firebase/serviceAccountKey.json
+src/main/resources/serviceAccountKey.json
+serviceAccountKey.json
+*serviceAccountKey*.json
+
