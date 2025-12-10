@@ -7,12 +7,12 @@ INSERT INTO tb_rol (descripcion) VALUES
 (nombres, ape_pat, ape_mat, documento, email, contra, telefono, imagen_url, rol_id)
 VALUES
 ('Carlos', 'Ramirez', 'Lopez', '12345678', 'carlos.admin@example.com', 'pass123', '987654321', NULL, 1),  -- Administrador
-*/
+
 
 ('María', 'Torres', 'Sanchez', '87654321', 'maria.productor@example.com', 'pass456', '912345678', NULL, 2), -- Productor
 
 ('Luis', 'Fernandez', 'Gomez', '55667788', 'luis.vete@example.com', 'pass789', '999888777', NULL, 3);     -- Veterinario
-
+*/
 INSERT INTO tb_especies (nombre) VALUES
 ('Vacuno'),
 ('Porcino'),
