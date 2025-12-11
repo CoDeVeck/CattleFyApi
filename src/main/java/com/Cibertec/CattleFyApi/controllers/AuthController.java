@@ -1,90 +1,94 @@
 package com.Cibertec.CattleFyApi.controllers;
 
-import com.Cibertec.CattleFyApi.dto.ResultadoResponse;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
+import com.Cibertec.CattleFyApi.dto.*;
 import com.Cibertec.CattleFyApi.models.Usuario;
-import com.Cibertec.CattleFyApi.service.CloudinaryService;
-import com.Cibertec.CattleFyApi.service.UsuarioService;
-import com.Cibertec.CattleFyApi.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.Cibertec.CattleFyApi.service.AuthService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+    private final AuthService authService;
 
-    @Autowired
-    JwtUtil jwtUtil;
-
-    @Autowired
-    UsuarioService usuarioService;
-
-    @Autowired
-    CloudinaryService cloudinaryService;
-
-
-
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUsuario(@RequestParam("email")String email,
-                                          @RequestParam("contra") String contra){
-
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, contra)
-        );
-
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-
-        List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
-
-        String token = jwtUtil.generateToken(email, roles);
-        return  ResponseEntity.ok(Map.of("token", token));
-
-    }
-
-
-    @PostMapping(value= "/register", consumes = {"multipart/form-data"})
-    public ResponseEntity<?> registrarUsuario(@ModelAttribute Usuario usuario){
-
+    @PostMapping("/registro")
+    public ResponseEntity<ResultadoResponse<AuthResponseDTO>> registrar(
+            @RequestBody RegistroRequestDTO request) {
         try {
-            String urlImagen = cloudinaryService.uploadImage(
-                    usuario.getImagenMultipart(), "CattleFy/Usuario");
+            AuthResponseDTO auth = authService.registrarUsuario(request);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ResultadoResponse.success("Usuario registrado exitosamente", auth));
 
-            usuario.setImagenUrl(urlImagen);
+        } catch (FirebaseAuthException e) {
+            log.error("Error de Firebase al registrar: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ResultadoResponse.error("Error en Firebase: " + e.getMessage()));
 
-            ResultadoResponse resultado = usuarioService.createUser(usuario);
-
-            return ResponseEntity.ok(resultado);
+        } catch (IllegalArgumentException e) {
+            log.error("Error de validación: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ResultadoResponse.error(e.getMessage()));
 
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error registrando usuario: " + e.getMessage());
+            log.error("Error inesperado al registrar: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResultadoResponse.error("Error interno del servidor"));
         }
     }
-    
-    
-    @GetMapping("/me")
-    public ResponseEntity<?> getUsuarioInfo(Authentication authentication){
-        String correoUsu = authentication.getName();
-        Optional<Usuario> usuarioOPT = usuarioService.obtenerDatos(correoUsu);
 
-        if (usuarioOPT.isEmpty()){
-            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontardo");
+    @PostMapping("/login")
+    public ResponseEntity<ResultadoResponse<AuthResponseDTO>> login(
+            @RequestBody LoginRequestDTO request) {
+        try {
+            AuthResponseDTO auth = authService.loginUsuario(request);
+            return ResponseEntity.ok(ResultadoResponse.success("Login exitoso", auth));
+
+        } catch (FirebaseAuthException e) {
+            log.error("Error de Firebase al hacer login: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ResultadoResponse.error("Error en Firebase: " + e.getMessage()));
+
+        } catch (IllegalArgumentException e) {
+            log.error("Credenciales inválidas: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ResultadoResponse.error(e.getMessage()));
+
+        } catch (Exception e) {
+            log.error("Error inesperado al hacer login: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResultadoResponse.error("Error interno del servidor"));
         }
-        Usuario usuario = usuarioOPT.get();
+    }
 
-        return  ResponseEntity.ok(usuario);
+    @PostMapping("/fcm-token")
+    public ResponseEntity<ResultadoResponse<Void>> actualizarFcmToken(
+            @AuthenticationPrincipal String firebaseUid,
+            @RequestBody Map<String, String> payload) {
+        try {
+            String fcmToken = payload.get("fcmToken");
+            if (fcmToken == null || fcmToken.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(ResultadoResponse.error("El FCM token es requerido"));
+            }
+
+            authService.actualizarFcmToken(firebaseUid, fcmToken);
+            return ResponseEntity.ok(ResultadoResponse.success("FCM token actualizado"));
+
+        } catch (Exception e) {
+            log.error("Error al actualizar FCM token: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ResultadoResponse.error(e.getMessage()));
+        }
     }
 }
