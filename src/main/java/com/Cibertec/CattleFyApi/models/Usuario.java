@@ -14,9 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 public class Usuario {
 
-	
-	
-	 @Id
+        @Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    @Column(name = "usuario_id")
 	    private Integer usuarioId;
@@ -64,4 +62,8 @@ public class Usuario {
 	    @JsonIgnore
 	    @Transient
 	    private MultipartFile imagenMultipart; // para la subida de imagens
+
+		// Firebase UID para vincular con Firebase Auth
+		@Column(name = "firebase_uid", unique = true, length = 128)
+		private String firebaseUid;
 }

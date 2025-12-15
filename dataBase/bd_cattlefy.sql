@@ -12,6 +12,7 @@ CREATE TABLE tb_usuarios (
     email VARCHAR(50) NOT NULL UNIQUE,
     contra VARCHAR(150) NOT NULL,
     telefono VARCHAR(20) NOT NULL,
+    firebase_uid VARCHAR(128),
 	imagen_url TEXT null,
     rol_id INT REFERENCES tb_rol(rol_id),
     fecha_registro TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
