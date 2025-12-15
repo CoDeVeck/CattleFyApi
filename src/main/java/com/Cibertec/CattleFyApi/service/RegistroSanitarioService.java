@@ -19,12 +19,6 @@ public class RegistroSanitarioService {
     public ResultadoResponse<RegistroSanitario> crearRegistroMasivo(RegistroSanitario rs){
         try{
             rs.setAnimal(null);
-            if (rs.getImagenMultipart() != null && !rs.getImagenMultipart().isEmpty()) {
-                String imageUrl = cloudinaryService.uploadImage(rs.getImagenMultipart(), "registros_sanitarios");
-                rs.setImagenUrl(imageUrl);
-            } else {
-                rs.setImagenUrl(null);
-            }
             rs.setFechaAplicacion(LocalDateTime.now());
             RegistroSanitario registroGuardado = registroSanitarioRepository.save(rs);
             return ResultadoResponse.success("El lote fue creado exitosamente.", registroGuardado);
