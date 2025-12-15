@@ -66,7 +66,7 @@ public class LoteService {
             Lote loteGuardado = loteRepository.save(lote);
             return ResultadoResponse.success("El lote fue creado exitosamente.", loteGuardado);
         } catch (Exception e) {
-            String mensajeError = "Ocurrió un error al crear registro masivo: " + e.getMessage();
+            String mensajeError = "Ocurrió un error al crear registro lote: " + e.getMessage();
             return ResultadoResponse.error(mensajeError);
         }
     }

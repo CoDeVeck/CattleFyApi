@@ -64,7 +64,7 @@ CREATE TABLE tb_animales (
     lote_id INT NOT NULL REFERENCES tb_lotes(lote_id),
     madre_id INT REFERENCES tb_animales(animal_id),
     origen VARCHAR(20) NOT NULL CHECK (origen IN ('Compra', 'Nacimiento')),
-	sexo CHAR(1) NOT NULL CHECK (sexo IN ('F', 'M'))
+	sexo CHAR(1) NOT NULL CHECK (sexo IN ('F', 'M')),
     fecha_ingreso TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	fecha_nacimiento TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     peso DECIMAL(10, 2),
