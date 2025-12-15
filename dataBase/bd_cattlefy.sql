@@ -130,7 +130,7 @@ CREATE TABLE tb_registro_produccion (
     cantidad DECIMAL(10, 2) NOT NULL
 );
 
--- MOVILIDAD (Traslados entre lotes)
+-- MOVILIDAD (Traslados entre lotes - INDIVIDUAL)
 CREATE TABLE tb_registro_movilidad (
     movilidad_id SERIAL PRIMARY KEY,
     animal_id INT NOT NULL REFERENCES tb_animales(animal_id) ON DELETE CASCADE,
@@ -152,9 +152,8 @@ CREATE TABLE tb_registro_muerte (
 CREATE TABLE tb_registro_venta (
     venta_id SERIAL PRIMARY KEY,
     lote_id INT REFERENCES tb_lotes(lote_id),
-    tipo_venta VARCHAR(30) NOT NULL CHECK (tipo_venta IN ('Engorde-Lote', 'Descarte-Lote', 'Individual', 'Produccion')),
-    tipo_producto VARCHAR(20) CHECK (tipo_producto IN ('Leche', 'Huevos')),
-    cantidad_producto DECIMAL(10, 2),
+	tipo_alcance_venta VARCHAR(10) CHECK (tipo_alcance_venta IN ('Total', 'Parcial')) NOT NULL;
+    tipo_venta VARCHAR(30) NOT NULL CHECK (tipo_venta IN ('Engorde', 'Reproduccion', 'Descarte')),
     peso_total_kg DECIMAL(10, 2),
     precio_por_kg DECIMAL(10, 2),
     precio_total DECIMAL(10, 2) NOT NULL,

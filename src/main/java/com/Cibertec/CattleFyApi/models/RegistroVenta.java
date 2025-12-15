@@ -23,14 +23,11 @@ public class RegistroVenta {
 	    @JoinColumn(name = "lote_id")
 	    private Lote lote;
 	    
+	    @Column(name = "tipo_alcance_venta")
+	    private String alcanceVenta;
+	    
 	    @Column(name = "tipo_venta")
 	    private String tipoVenta;
-	    
-	    @Column(name = "tipo_producto")
-	    private String tipoProducto; 
-	    
-	    @Column(name = "cantidad_producto")
-	    private BigDecimal cantidadProducto;
 	    
 	    @Column(name = "peso_total_kg")
 	    private BigDecimal pesoTotalKg;
