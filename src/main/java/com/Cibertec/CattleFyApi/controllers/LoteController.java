@@ -1,21 +1,30 @@
 package com.Cibertec.CattleFyApi.controllers;
 
+import com.Cibertec.CattleFyApi.dto.LoteListadoDTO;
 import com.Cibertec.CattleFyApi.dto.ResultadoResponse;
 import com.Cibertec.CattleFyApi.models.Lote;
 import com.Cibertec.CattleFyApi.service.LoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/lote")
 @RequiredArgsConstructor
 @RestController
 public class LoteController {
     private final LoteService loteService;
+
+    @GetMapping("/list")
+    public ResponseEntity<List<LoteListadoDTO>> list(){
+        List<LoteListadoDTO> listado = loteService.list();
+        if(!listado.isEmpty()){
+            return new ResponseEntity<>(listado, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(listado, HttpStatus.NOT_FOUND);
+    }
 
     @PostMapping("/create")
     public ResponseEntity<ResultadoResponse<Lote>> crearLote(@RequestBody Lote lote) {
