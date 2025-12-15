@@ -9,4 +9,12 @@ public class NotificacionService {
 
     @Autowired
     INotificacionRepository notificacionRepository;
+    
+    public Long totalAlertasCriticas(Integer granjaId) {
+    	
+    	Long alertas = notificacionRepository.contarAlertasCriticasPorGranja(granjaId);
+    	return alertas;
+    }
+    
+    
 }

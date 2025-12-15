@@ -6,9 +6,6 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "tb_registro_sanitario")
@@ -55,8 +52,5 @@ public class RegistroSanitario {
     @Column(name = "fecha_aplicacion", nullable = false)
     private LocalDateTime fechaAplicacion;
     
-    @JsonIgnore
-    @Transient
-    private MultipartFile imagenMultipart; // para la subida de imagens
 	
 }
