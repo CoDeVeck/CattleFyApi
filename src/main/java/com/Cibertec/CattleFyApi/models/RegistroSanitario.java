@@ -43,14 +43,9 @@ public class RegistroSanitario {
     @Column(name = "cantidad_dosis", precision = 10, scale = 2)
     private BigDecimal cantidadDosis = BigDecimal.ONE;
     
-    @Column(name = "imagen_url", columnDefinition = "TEXT")
-    private String imagenUrl;
-    
     @Column(name = "animales_tratados")
     private Integer animalesTratados;
     
     @Column(name = "fecha_aplicacion", nullable = false)
     private LocalDateTime fechaAplicacion;
-    
-	
 }

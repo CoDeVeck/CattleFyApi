@@ -21,9 +21,10 @@ public interface ILoteRepository  extends JpaRepository<Lote, Integer>{
     Optional<Lote> findByCodigoQr(String codigoQr);
     
     boolean existsByCodigoQr(String codigoQr);
-    
+
     @Query("""
-        SELECT l FROM Lote l WHERE l.granja.granjaId = :granjaId
+        SELECT l FROM Lote l
+        WHERE (:granjaId IS NULL OR l.granja.granjaId = :granjaId)
         AND (:especieId IS NULL OR l.especie.especieId = :especieId)
         AND (:tipoLote IS NULL OR l.categoria.tipoLote = :tipoLote)
         AND l.estado != 'Inactivo'

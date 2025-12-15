@@ -25,5 +25,4 @@ public class RegistroSanitarioResponse {
     private Integer animalesTratados; 
     
     private LocalDateTime fechaAplicacion;
-    private String imagenUrl;
 }

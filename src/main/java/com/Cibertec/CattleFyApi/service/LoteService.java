@@ -59,17 +59,6 @@ public class LoteService {
         }).collect(Collectors.toList());
     }
 
-    public ResultadoResponse<Lote> crearLote(Lote lote) {
-        try {
-            lote.setEstado("Activo");
-            lote.setFechaCreacion(LocalDateTime.now());
-            Lote loteGuardado = loteRepository.save(lote);
-            return ResultadoResponse.success("El lote fue creado exitosamente.", loteGuardado);
-        } catch (Exception e) {
-            String mensajeError = "Ocurrió un error al crear registro lote: " + e.getMessage();
-            return ResultadoResponse.error(mensajeError);
-        }
-    }
     public Long totalLotesActivos(Integer granjaId) {
         Long lotes = loteRepository.contarLotesActivos(granjaId);
         return lotes;
@@ -106,30 +95,39 @@ public class LoteService {
     }
 
     @Transactional
-    public LoteResponse registrarLote(LoteRequest req) {
-        Lote lote = new Lote();
+    public ResultadoResponse<LoteResponse> registrarLote(LoteRequest req) {
+        try {
+            Lote lote = new Lote();
 
-        String codigoQr = generadorQRS.generarCodigoQrLote();
-        lote.setCodigoQr(codigoQr);
+            String codigoQr = generadorQRS.generarCodigoQrLote();
+            lote.setCodigoQr(codigoQr);
 
-        lote.setGranja(granjaRepository.findById(req.getIdGranja())
-                .orElseThrow(() -> new EntityNotFoundException("Granja no encontrada con ID: " + req.getIdGranja())));
+            lote.setGranja(granjaRepository.findById(req.getIdGranja())
+                    .orElseThrow(() -> new EntityNotFoundException("Granja no encontrada con ID: " + req.getIdGranja())));
 
-        lote.setEspecie(especieRepository.findById(req.getIdEspecie())
-                .orElseThrow(() -> new EntityNotFoundException("Especie no encontrada con ID: " + req.getIdEspecie())));
+            lote.setEspecie(especieRepository.findById(req.getIdEspecie())
+                    .orElseThrow(() -> new EntityNotFoundException("Especie no encontrada con ID: " + req.getIdEspecie())));
 
-        lote.setCategoria(categoriaManejoRepository.findById(req.getIdCategoria())
-                .orElseThrow(() -> new EntityNotFoundException("Categoría de Manejo no encontrada con ID: " + req.getIdCategoria())));
+            lote.setCategoria(categoriaManejoRepository.findById(req.getIdCategoria())
+                    .orElseThrow(() -> new EntityNotFoundException("Categoría de Manejo no encontrada con ID: " + req.getIdCategoria())));
 
-        lote.setNombre(req.getNombre());
-        lote.setCapacidadMax(req.getCapacidadMax());
+            lote.setNombre(req.getNombre());
+            lote.setCapacidadMax(req.getCapacidadMax());
 
-        lote.setFechaCreacion(LocalDateTime.now());
-        lote.setEstado("Inactivo");
+            lote.setFechaCreacion(LocalDateTime.now());
+            lote.setEstado("Inactivo");
 
-        Lote loteGuardado = loteRepository.save(lote);
+            Lote loteGuardado = loteRepository.save(lote);
 
-        return convertToDto(loteGuardado);
+            LoteResponse loteResponse = convertToDto(loteGuardado);
+
+            return ResultadoResponse.success("Lote registrado exitosamente.", loteResponse);
+
+        } catch (EntityNotFoundException e) {
+            return ResultadoResponse.error("Error al registrar lote: " + e.getMessage());
+        } catch (Exception e) {
+            return ResultadoResponse.error("Ocurrió un error inesperado al registrar el lote.");
+        }
     }
 
     public LoteResponse obtenerLotePorId(Integer loteId) {

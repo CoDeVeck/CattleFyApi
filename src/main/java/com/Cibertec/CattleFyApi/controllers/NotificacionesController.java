@@ -13,7 +13,6 @@ import com.Cibertec.CattleFyApi.service.NotificacionService;
 @RequestMapping("/notificaciones")
 public class NotificacionesController {
 
-	
 	@Autowired
 	NotificacionService notificacionesService;
 	
