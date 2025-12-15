@@ -47,6 +47,7 @@ CREATE TABLE tb_categorias_manejo (
 
 CREATE TABLE tb_lotes (
     lote_id SERIAL PRIMARY KEY,
+	lote_qr VARCHAR(200) NOT NULL,
     granja_id INT NOT NULL REFERENCES tb_granjas(granja_id) ON DELETE CASCADE,
     nombre VARCHAR(100) NOT NULL,
     especie_id INT NOT NULL REFERENCES tb_especies(especie_id),
@@ -58,13 +59,15 @@ CREATE TABLE tb_lotes (
 
 CREATE TABLE tb_animales (
     animal_id SERIAL PRIMARY KEY,
-    codigo_qr VARCHAR(50) NOT NULL UNIQUE,
+    animal_qr VARCHAR(50) NOT NULL UNIQUE,
     especie_id INT NOT NULL REFERENCES tb_especies(especie_id),
     lote_id INT NOT NULL REFERENCES tb_lotes(lote_id),
     madre_id INT REFERENCES tb_animales(animal_id),
     origen VARCHAR(20) NOT NULL CHECK (origen IN ('Compra', 'Nacimiento')),
+	sexo CHAR(1) NOT NULL CHECK (sexo IN ('F', 'M'))
     fecha_ingreso TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    peso_inicial DECIMAL(10, 2),
+	fecha_nacimiento TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    peso DECIMAL(10, 2),
     precio_compra DECIMAL(10, 2),
     estado VARCHAR(20) NOT NULL DEFAULT 'Vivo' CHECK (estado IN ('Vivo', 'Vendido', 'Muerto')),
     foto_url TEXT null
@@ -101,9 +104,8 @@ CREATE TABLE tb_registro_sanitario (
     nombre_producto VARCHAR(100) NOT NULL,
     costo_por_dosis DECIMAL(10, 4) NOT NULL,
     cantidad_dosis DECIMAL(10, 2) DEFAULT 1,
-	imagen_url TEXT null,
     animales_tratados INT,
-    fecha_aplicacion TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    fecha_aplicacion TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT chk_aplicacion_valida CHECK (
         (tipo_aplicacion = 'Individual' AND animal_id IS NOT NULL AND animales_tratados IS NULL) OR
         (tipo_aplicacion = 'Masivo' AND lote_id IS NOT NULL AND animales_tratados IS NOT NULL)
@@ -170,13 +172,22 @@ CREATE TABLE tb_tipos_notificacion (
 
 CREATE TABLE tb_notificaciones (
     notificacion_id SERIAL PRIMARY KEY,
-    usuario_id INT NOT NULL REFERENCES tb_usuarios(usuario_id) ON DELETE CASCADE,
-    tipo_notificacion_id INT NOT NULL REFERENCES tb_tipos_notificacion(tipo_notificacion_id),
+    granja_id INT NOT NULL
+        REFERENCES tb_granjas(granja_id)
+        ON DELETE CASCADE,
+    usuario_id INT NOT NULL
+        REFERENCES tb_usuarios(usuario_id)
+        ON DELETE CASCADE,
+    tipo_notificacion_id INT NOT NULL
+        REFERENCES tb_tipos_notificacion(tipo_notificacion_id),
     titulo VARCHAR(100) NOT NULL,
     mensaje TEXT NOT NULL,
-    lote_id INT NULL REFERENCES tb_lotes(lote_id),
-    animal_id INT NULL REFERENCES tb_animales(animal_id),
-    venta_id INT NULL REFERENCES tb_registro_venta(venta_id),
+    lote_id INT NULL
+        REFERENCES tb_lotes(lote_id),
+    animal_id INT NULL
+        REFERENCES tb_animales(animal_id),
+    venta_id INT NULL
+        REFERENCES tb_registro_venta(venta_id),
     fecha_creacion TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     leida BOOLEAN DEFAULT FALSE,
     descartada BOOLEAN DEFAULT FALSE

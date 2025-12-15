@@ -23,7 +23,7 @@ public class Animal {
 	    @Column(name = "animal_id")
 	    private Integer animalId;
 	    
-	    @Column(name = "codigo_qr")
+	    @Column(name = "animal_qr")
 	    private String codigoQr;
 	    
 	    @ManyToOne
@@ -39,13 +39,19 @@ public class Animal {
 	    private Animal madre;
 	    
 	    @Column(name = "origen")
-	    private String origen; 
-	    
-	    @Column(name = "fecha_ingreso")
+	    private String origen;
+
+        @Column(name = "sexo")
+        private String sexo;
+
+        @Column(name = "fecha_ingreso")
 	    private LocalDateTime fechaIngreso;
 	    
-	    @Column(name = "peso_inicial")
-	    private BigDecimal pesoInicial;
+	    @Column(name = "fecha_nacimiento")
+	    private LocalDateTime fechaNacimiento;
+	    
+	    @Column(name = "peso")
+	    private BigDecimal peso;
 	    
 	    @Column(name = "precio_compra")
 	    private BigDecimal precioCompra;

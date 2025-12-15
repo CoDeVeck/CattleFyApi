@@ -20,6 +20,10 @@ public class Notificacion {
     private Integer notificacionId;
     
     @ManyToOne
+    @JoinColumn(name = "granja_id")
+    private Granja granja;
+
+    @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
     
