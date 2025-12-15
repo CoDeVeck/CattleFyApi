@@ -23,7 +23,7 @@ public class AuthService {
     private final IUsuarioRepository usuarioRepository;
     private final IRolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final FirebaseTokenService firebaseTokenService;
     @Transactional
     public AuthResponseDTO registrarUsuario(RegistroRequestDTO request) throws FirebaseAuthException {
         // 1. Validaciones
@@ -96,7 +96,8 @@ public class AuthService {
 
         // 4. Generar custom token de Firebase
         String customToken = FirebaseAuth.getInstance().createCustomToken(usuario.getFirebaseUid());
-
+        String idToken =
+                firebaseTokenService.exchangeCustomTokenForIdToken(customToken);
         // 5. Retornar respuesta
         return AuthResponseDTO.builder()
                 .usuarioId(usuario.getUsuarioId())
@@ -104,7 +105,7 @@ public class AuthService {
                 .email(usuario.getEmail())
                 .nombres(usuario.getNombres())
                 .apellidos(usuario.getApePat() + " " + usuario.getApeMat())
-                .token(customToken)
+                .token(idToken)
                 .rol(usuario.getRol().getDescripcion())
                 .build();
     }
