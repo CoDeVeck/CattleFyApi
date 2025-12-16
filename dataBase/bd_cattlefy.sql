@@ -152,7 +152,7 @@ CREATE TABLE tb_registro_muerte (
 CREATE TABLE tb_registro_venta (
     venta_id SERIAL PRIMARY KEY,
     lote_id INT REFERENCES tb_lotes(lote_id),
-	tipo_alcance_venta VARCHAR(10) CHECK (tipo_alcance_venta IN ('Total', 'Parcial')) NOT NULL;
+	tipo_alcance_venta VARCHAR(10) CHECK (tipo_alcance_venta IN ('Total', 'Parcial')) NOT NULL,
     tipo_venta VARCHAR(30) NOT NULL CHECK (tipo_venta IN ('Engorde', 'Reproduccion', 'Descarte')),
     peso_total_kg DECIMAL(10, 2),
     precio_por_kg DECIMAL(10, 2),
