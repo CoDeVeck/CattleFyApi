@@ -1,10 +1,7 @@
 package com.Cibertec.CattleFyApi.service;
 
-import com.Cibertec.CattleFyApi.dto.LoteListadoDTO;
-import com.Cibertec.CattleFyApi.dto.ResultadoResponse;
+import com.Cibertec.CattleFyApi.dto.*;
 import com.Cibertec.CattleFyApi.models.Lote;
-import com.Cibertec.CattleFyApi.dto.LoteRequest;
-import com.Cibertec.CattleFyApi.dto.LoteResponse;
 import com.Cibertec.CattleFyApi.repository.IAnimalRepository;
 import com.Cibertec.CattleFyApi.repository.ICategoriaManejoRepository;
 import com.Cibertec.CattleFyApi.repository.IEspecieRepository;
@@ -58,6 +55,19 @@ public class LoteService {
                     .build();
         }).collect(Collectors.toList());
     }
+
+    public List<LoteSimpleDTO> listarLotesSimples() {
+
+        List<Lote> lotes = loteRepository.findAll();
+
+        return lotes.stream()
+                .map(l -> new LoteSimpleDTO(
+                        l.getLoteId(),
+                        l.getNombre()
+                ))
+                .toList();
+    }
+
 
     public Long totalLotesActivos(Integer granjaId) {
         Long lotes = loteRepository.contarLotesActivos(granjaId);

@@ -1,6 +1,8 @@
 package com.Cibertec.CattleFyApi.controllers;
 
 import com.Cibertec.CattleFyApi.dto.RegistrarAlimentacionHistorialDTO;
+import com.Cibertec.CattleFyApi.dto.RegistroAlimentacionRequestDTO;
+import com.Cibertec.CattleFyApi.dto.RegistroAlimentacionResponseDTO;
 import com.Cibertec.CattleFyApi.dto.ResultadoResponse;
 import com.Cibertec.CattleFyApi.models.RegistroAlimentacion;
 import com.Cibertec.CattleFyApi.service.RegistroAlimentacionService;
@@ -27,8 +29,8 @@ public class RegistrarAlimentacionController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ResultadoResponse<RegistroAlimentacion>> create(@RequestBody RegistroAlimentacion ra){
-        ResultadoResponse<RegistroAlimentacion> respuesta = alimentacionService.crearAlimentacion(ra);
+    public ResponseEntity<ResultadoResponse<RegistroAlimentacionResponseDTO>> create(@RequestBody RegistroAlimentacionRequestDTO ra){
+        ResultadoResponse<RegistroAlimentacionResponseDTO> respuesta = alimentacionService.crearAlimentacion(ra);
         if (respuesta.isValor()) {
             return new ResponseEntity<>(respuesta, HttpStatus.CREATED);
         } else {

@@ -1,9 +1,6 @@
 package com.Cibertec.CattleFyApi.controllers;
 
-import com.Cibertec.CattleFyApi.dto.LoteListadoDTO;
-import com.Cibertec.CattleFyApi.dto.LoteRequest;
-import com.Cibertec.CattleFyApi.dto.LoteResponse;
-import com.Cibertec.CattleFyApi.dto.ResultadoResponse;
+import com.Cibertec.CattleFyApi.dto.*;
 import com.Cibertec.CattleFyApi.models.Lote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +22,16 @@ public class LotesController {
     public ResponseEntity<Long> obtenerTotalLotesActivos(@PathVariable Integer granjaId) {
         Long lotes = lotesService.totalLotesActivos(granjaId);
         return ResponseEntity.ok(lotes);
+    }
+
+    @GetMapping("/list-simple")
+    public ResponseEntity<ResultadoResponse<List<LoteSimpleDTO>>> listarLotesSimple() {
+
+        List<LoteSimpleDTO> lotes = lotesService.listarLotesSimples();
+
+        return ResponseEntity.ok(
+                ResultadoResponse.success("Lotes listados", lotes)
+        );
     }
 
     @GetMapping("/listFiltro")
