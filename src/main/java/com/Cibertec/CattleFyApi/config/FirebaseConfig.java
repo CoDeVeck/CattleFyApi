@@ -9,12 +9,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream; // <-- Nueva Importación
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files; // <-- Nueva Importación
-import java.nio.file.Path;  // <-- Nueva Importación
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Slf4j
 @Configuration("firebaseConfig")

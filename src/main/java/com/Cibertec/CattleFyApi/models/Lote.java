@@ -1,6 +1,7 @@
 package com.Cibertec.CattleFyApi.models;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,9 @@ public class Lote {
     @Column(name = "lote_id")
     private Integer loteId;
     
+    @Column(name = "lote_qr")
+    private String codigoQr;
+
     @ManyToOne
     @JoinColumn(name = "granja_id")
     private Granja granja;
