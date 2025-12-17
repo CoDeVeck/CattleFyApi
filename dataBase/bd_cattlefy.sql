@@ -53,7 +53,7 @@ CREATE TABLE tb_lotes (
     especie_id INT NOT NULL REFERENCES tb_especies(especie_id),
     categoria_id INT REFERENCES tb_categorias_manejo(categoria_id),
     fecha_creacion TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    estado VARCHAR(20) NOT NULL DEFAULT 'Activo' CHECK (estado IN ('Activo', 'Inactivo')),
+    estado VARCHAR(20) NOT NULL DEFAULT 'Activo' CHECK (estado IN ('Activo', 'Cerrado','Inactivo')),
     capacidad_max INT
 );
 
@@ -64,7 +64,7 @@ CREATE TABLE tb_animales (
     lote_id INT NOT NULL REFERENCES tb_lotes(lote_id),
     madre_id INT REFERENCES tb_animales(animal_id),
     origen VARCHAR(20) NOT NULL CHECK (origen IN ('Compra', 'Nacimiento')),
-	sexo CHAR(1) NOT NULL CHECK (sexo IN ('F', 'M')),
+	sexo CHAR(1) NOT NULL CHECK (sexo IN ('H', 'M')),
     fecha_ingreso TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	fecha_nacimiento TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     peso DECIMAL(10, 2),
@@ -145,8 +145,7 @@ CREATE TABLE tb_registro_muerte (
     animal_id INT NOT NULL UNIQUE REFERENCES tb_animales(animal_id) ON DELETE CASCADE,
     lote_id INT REFERENCES tb_lotes(lote_id),
     fecha_muerte TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    causa_muerte TEXT NOT NULL,
-    peso_al_morir DECIMAL(10, 2)
+    causa_muerte TEXT NOT NULL
 );
 
 CREATE TABLE tb_registro_venta (

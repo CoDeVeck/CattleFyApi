@@ -18,7 +18,7 @@ public class LotesController {
 	@Autowired
 	LoteService lotesService;
 	
-    @GetMapping("/total-activos")
+    @GetMapping("/total-activos/{granjaId}")
     public ResponseEntity<Long> obtenerTotalLotesActivos(@PathVariable Integer granjaId) {
         Long lotes = lotesService.totalLotesActivos(granjaId);
         return ResponseEntity.ok(lotes);
@@ -67,4 +67,5 @@ public class LotesController {
             return new ResponseEntity<>(respuesta, HttpStatus.BAD_REQUEST);
         }
     }
+
 }

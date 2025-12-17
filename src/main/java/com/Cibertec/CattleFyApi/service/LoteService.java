@@ -125,7 +125,7 @@ public class LoteService {
             lote.setCapacidadMax(req.getCapacidadMax());
 
             lote.setFechaCreacion(LocalDateTime.now());
-            lote.setEstado("Inactivo");
+            lote.setEstado("Activo");
 
             Lote loteGuardado = loteRepository.save(lote);
 
