@@ -1,15 +1,13 @@
 package com.Cibertec.CattleFyApi.controllers;
 
+import com.Cibertec.CattleFyApi.dto.RegistroSanitarioListResponse;
+import com.Cibertec.CattleFyApi.dto.RegistroSanitarioRequest;
+import com.Cibertec.CattleFyApi.dto.RegistroSanitarioResponse;
 import com.Cibertec.CattleFyApi.dto.ResultadoResponse;
-import com.Cibertec.CattleFyApi.models.RegistroSanitario;
 import com.Cibertec.CattleFyApi.service.RegistroSanitarioService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/registroSanitario")
@@ -17,15 +15,28 @@ import org.springframework.web.bind.annotation.RestController;
 public class RegistroSanitarioControler {
     private final RegistroSanitarioService registroSanitarioService;
 
-    @PostMapping("/createMasivo")
-    public ResponseEntity<ResultadoResponse<RegistroSanitario>> createMasivo(
-            @ModelAttribute RegistroSanitario rs) {
-        ResultadoResponse<RegistroSanitario> respuesta = registroSanitarioService.crearRegistroMasivo(rs);
+    @PostMapping("/crear-unificado")
+    public ResponseEntity<ResultadoResponse<RegistroSanitarioResponse>> crearRegistroUnificado(
+            @ModelAttribute RegistroSanitarioRequest request) {
+        ResultadoResponse<RegistroSanitarioResponse> response =
+                registroSanitarioService.crearRegistroUnificado(request);
 
-        if (respuesta.isValor()) {
-            return new ResponseEntity<>(respuesta, HttpStatus.CREATED);
+        if (response.isValor()) {
+            return ResponseEntity.ok(response);
         } else {
-            return new ResponseEntity<>(respuesta, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @GetMapping("/listarHistorial")
+    public ResponseEntity<ResultadoResponse<RegistroSanitarioListResponse>> listarTodos() {
+        ResultadoResponse<RegistroSanitarioListResponse> response =
+                registroSanitarioService.listarTodos();
+
+        if (response.isValor()) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
         }
     }
 }

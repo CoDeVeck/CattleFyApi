@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -48,7 +49,7 @@ public class Animal {
 	    private LocalDateTime fechaIngreso;
 	    
 	    @Column(name = "fecha_nacimiento")
-	    private LocalDateTime fechaNacimiento;
+	    private LocalDate fechaNacimiento;
 	    
 	    @Column(name = "peso")
 	    private BigDecimal peso;

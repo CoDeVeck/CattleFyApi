@@ -17,7 +17,7 @@ import java.util.List;
 public class RegistrarAlimentacionController {
     private final RegistroAlimentacionService alimentacionService;
 
-    @GetMapping("/list")
+    @GetMapping("/listHistorial")
     public ResponseEntity<List<RegistrarAlimentacionHistorialDTO>> listarHistorial(){
         List<RegistrarAlimentacionHistorialDTO> historial = alimentacionService.listarHistorialAlimentacion();
         if(!historial.isEmpty()){

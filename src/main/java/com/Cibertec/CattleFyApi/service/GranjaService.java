@@ -30,6 +30,11 @@ public class GranjaService {
         Usuario usuario = usuarioRepository.findById(request.getUsuarioId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + request.getUsuarioId()));
 
+        // Validar si el usuario ya tiene una granja registrada
+        if (granjaRepository.existsByUsuario(usuario)) {
+            throw new RuntimeException("El usuario ya tiene una granja registrada");
+        }
+
         Granja granja = new Granja();
         granja.setUsuario(usuario);
         granja.setNombre(request.getNombre());
@@ -43,7 +48,6 @@ public class GranjaService {
         }
 
         Granja granjaGuardada = granjaRepository.save(granja);
-
         return convertToDto(granjaGuardada);
     }
 

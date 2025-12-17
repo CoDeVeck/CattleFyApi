@@ -23,11 +23,9 @@ public class GranjaController {
 
     @PostMapping(value = "/registrar", consumes = {"multipart/form-data"})
     public ResponseEntity<?> registrarGranja(
-            @ModelAttribute GranjaRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @ModelAttribute GranjaRequest request) {
 
         try {
-            String emailUsuario = userDetails.getUsername();
             GranjaResponse response = granjaService.registrarGranja(request);
 
             return ResponseEntity.ok(response);
