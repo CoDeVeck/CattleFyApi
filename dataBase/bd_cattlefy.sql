@@ -53,7 +53,7 @@ CREATE TABLE tb_lotes (
     especie_id INT NOT NULL REFERENCES tb_especies(especie_id),
     categoria_id INT REFERENCES tb_categorias_manejo(categoria_id),
     fecha_creacion TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    estado VARCHAR(20) NOT NULL DEFAULT 'Activo' CHECK (estado IN ('Activo', 'Inactivo')),
+    estado VARCHAR(20) NOT NULL DEFAULT 'Activo' CHECK (estado IN ('Activo', 'Cerrado','Inactivo')),
     capacidad_max INT
 );
 
@@ -64,7 +64,7 @@ CREATE TABLE tb_animales (
     lote_id INT NOT NULL REFERENCES tb_lotes(lote_id),
     madre_id INT REFERENCES tb_animales(animal_id),
     origen VARCHAR(20) NOT NULL CHECK (origen IN ('Compra', 'Nacimiento')),
-	sexo CHAR(1) NOT NULL CHECK (sexo IN ('F', 'M')),
+	sexo CHAR(1) NOT NULL CHECK (sexo IN ('H', 'M')),
     fecha_ingreso TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 	fecha_nacimiento TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     peso DECIMAL(10, 2),
@@ -152,7 +152,7 @@ CREATE TABLE tb_registro_muerte (
 CREATE TABLE tb_registro_venta (
     venta_id SERIAL PRIMARY KEY,
     lote_id INT REFERENCES tb_lotes(lote_id),
-	tipo_alcance_venta VARCHAR(10) CHECK (tipo_alcance_venta IN ('Total', 'Parcial')) NOT NULL;
+	tipo_alcance_venta VARCHAR(10) CHECK (tipo_alcance_venta IN ('Total', 'Parcial')) NOT NULL,
     tipo_venta VARCHAR(30) NOT NULL CHECK (tipo_venta IN ('Engorde', 'Reproduccion', 'Descarte')),
     peso_total_kg DECIMAL(10, 2),
     precio_por_kg DECIMAL(10, 2),

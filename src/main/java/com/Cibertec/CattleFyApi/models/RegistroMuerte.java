@@ -33,6 +33,4 @@ public class RegistroMuerte {
     @Column(name = "causa_muerte")
     private String causaMuerte;
     
-    @Column(name = "peso_al_morir")
-    private BigDecimal pesoAlMorir;
 }

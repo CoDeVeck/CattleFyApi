@@ -14,12 +14,12 @@ import lombok.*;
 @AllArgsConstructor
 public class Granja {
 
-	  @Id
+	  	@Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    @Column(name = "granja_id")
 	    private Integer granjaId;
 	    
-	    @ManyToOne
+	    @OneToOne
 	    @JoinColumn(name = "usuario_id")
 	    private Usuario usuario;
 	    

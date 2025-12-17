@@ -1,9 +1,6 @@
 package com.Cibertec.CattleFyApi.controllers;
 
-import com.Cibertec.CattleFyApi.dto.LoteListadoDTO;
-import com.Cibertec.CattleFyApi.dto.LoteRequest;
-import com.Cibertec.CattleFyApi.dto.LoteResponse;
-import com.Cibertec.CattleFyApi.dto.ResultadoResponse;
+import com.Cibertec.CattleFyApi.dto.*;
 import com.Cibertec.CattleFyApi.models.Lote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +18,7 @@ public class LotesController {
 	@Autowired
 	LoteService lotesService;
 	
-    @GetMapping("/total-activos")
+    @GetMapping("/total-activos/{granjaId}")
     public ResponseEntity<Long> obtenerTotalLotesActivos(@PathVariable Integer granjaId) {
         Long lotes = lotesService.totalLotesActivos(granjaId);
         return ResponseEntity.ok(lotes);
@@ -60,4 +57,5 @@ public class LotesController {
             return new ResponseEntity<>(respuesta, HttpStatus.BAD_REQUEST);
         }
     }
+
 }

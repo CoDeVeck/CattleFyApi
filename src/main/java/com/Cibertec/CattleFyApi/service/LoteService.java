@@ -1,10 +1,8 @@
 package com.Cibertec.CattleFyApi.service;
 
-import com.Cibertec.CattleFyApi.dto.LoteListadoDTO;
-import com.Cibertec.CattleFyApi.dto.ResultadoResponse;
+import com.Cibertec.CattleFyApi.dto.*;
+import com.Cibertec.CattleFyApi.models.Animal;
 import com.Cibertec.CattleFyApi.models.Lote;
-import com.Cibertec.CattleFyApi.dto.LoteRequest;
-import com.Cibertec.CattleFyApi.dto.LoteResponse;
 import com.Cibertec.CattleFyApi.repository.IAnimalRepository;
 import com.Cibertec.CattleFyApi.repository.ICategoriaManejoRepository;
 import com.Cibertec.CattleFyApi.repository.IEspecieRepository;
@@ -115,7 +113,7 @@ public class LoteService {
             lote.setCapacidadMax(req.getCapacidadMax());
 
             lote.setFechaCreacion(LocalDateTime.now());
-            lote.setEstado("Inactivo");
+            lote.setEstado("Activo");
 
             Lote loteGuardado = loteRepository.save(lote);
 

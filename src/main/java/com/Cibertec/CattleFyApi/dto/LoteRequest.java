@@ -10,6 +10,5 @@ public class LoteRequest {
     private String nombre;
     private int idEspecie;
     private int idCategoria;
-    private int diasDesdeCreacion;
     private int capacidadMax;
 }

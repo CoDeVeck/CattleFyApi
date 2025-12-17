@@ -16,7 +16,7 @@ public class NotificacionesController {
 	@Autowired
 	NotificacionService notificacionesService;
 	
-    @GetMapping("/total-criticas")
+    @GetMapping("/total-criticas/{granjaId}")
     public ResponseEntity<Long> obtenerTotalAlertasCriticas(@PathVariable Integer granjaId) {
         Long notis = notificacionesService.totalAlertasCriticas(granjaId);
         return ResponseEntity.ok(notis);

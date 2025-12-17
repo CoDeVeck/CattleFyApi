@@ -3,6 +3,9 @@ package com.Cibertec.CattleFyApi.dto;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Data
 public class AnimalResponse {
 
@@ -15,8 +18,8 @@ public class AnimalResponse {
     private int idMadre;
     private String codigoQrMadre;
     private String origen; // Compra o nacimiento
-    private String fechaIngreso;
-    private String fechaNacimiento; // es obligatorio
+    private LocalDateTime fechaIngreso;
+    private LocalDate fechaNacimiento; // es obligatorio
     private int edadEnDias;
     private String sexo;
     private Double peso;

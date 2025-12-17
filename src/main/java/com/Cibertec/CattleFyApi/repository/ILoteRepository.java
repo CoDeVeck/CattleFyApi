@@ -1,5 +1,6 @@
 package com.Cibertec.CattleFyApi.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +15,7 @@ public interface ILoteRepository  extends JpaRepository<Lote, Integer>{
     @Query("""
             SELECT COUNT(l) FROM Lote l
             WHERE l.estado = 'Activo' AND
-            l.granja.usuario.usuarioId = :usuarioId
+            l.granja.granjaId = :granjaId
             """)
     Long contarLotesActivos(@Param("granjaId") Integer granjaId);
     
@@ -34,4 +35,21 @@ public interface ILoteRepository  extends JpaRepository<Lote, Integer>{
         @Param("especieId") Integer especieId,
         @Param("tipoLote") String tipoLote
     );
+    
+    
+    @Query("SELECT l FROM Lote l " +
+            "JOIN FETCH l.especie e " +
+            "JOIN FETCH l.categoria c " +
+            "WHERE l.granja.granjaId = :granjaId " +
+            "AND l.estado = :estado " +
+            "AND c.tipoLote = :tipoLote " +
+            "ORDER BY l.fechaCreacion DESC")
+     List<Lote> findByGranjaIdAndEstadoAndTipoLote(
+         @Param("granjaId") Integer granjaId,
+         @Param("estado") String estado,
+         @Param("tipoLote") String tipoLote
+     );
+     
+     List<Lote> findByGranjaGranjaIdAndEstado(Integer granjaId, String estado);
+    
 }
