@@ -21,8 +21,7 @@ public class RegistroVentaRequest {
     
     // ROI OBJETIVO: El productor puede definir su margen deseado (opcional)
     // Si no se envía, el sistema calculará el ROI real basado en el precio de venta
-    private BigDecimal roiObjetivo;
+    private BigDecimal roiMeta;
     private String clienteNombre;    
-    // Lista de IDs de animales vendidos (obligatorio si es venta parcial)
     private List<Integer> animalesVendidosIds;
 }
