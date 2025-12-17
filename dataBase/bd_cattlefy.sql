@@ -145,8 +145,7 @@ CREATE TABLE tb_registro_muerte (
     animal_id INT NOT NULL UNIQUE REFERENCES tb_animales(animal_id) ON DELETE CASCADE,
     lote_id INT REFERENCES tb_lotes(lote_id),
     fecha_muerte TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    causa_muerte TEXT NOT NULL,
-    peso_al_morir DECIMAL(10, 2)
+    causa_muerte TEXT NOT NULL
 );
 
 CREATE TABLE tb_registro_venta (
