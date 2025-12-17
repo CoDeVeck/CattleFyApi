@@ -24,6 +24,16 @@ public class LotesController {
         return ResponseEntity.ok(lotes);
     }
 
+    @GetMapping("/list-simple")
+    public ResponseEntity<ResultadoResponse<List<LoteSimpleDTO>>> listarLotesSimple() {
+
+        List<LoteSimpleDTO> lotes = lotesService.listarLotesSimples();
+
+        return ResponseEntity.ok(
+                ResultadoResponse.success("Lotes listados", lotes)
+        );
+    }
+
     @GetMapping("/listFiltro")
     public ResponseEntity<ResultadoResponse<List<LoteResponse>>> listarLotes(
             @RequestParam(required = false) Integer granjaId,
