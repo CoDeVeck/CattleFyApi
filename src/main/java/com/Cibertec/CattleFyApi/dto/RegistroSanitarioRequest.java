@@ -10,8 +10,8 @@ public class RegistroSanitarioRequest {
     
 	// El qr es el identificador, de ahi llamar a cada repo para buscar animal x qr
     private String qrLote;
-    private String qrAnimal; 
-    
+    private String qrAnimal;
+    private Integer idLote;
     private String tipoAplicacion;
     private String protocoloTipo; 
     private String nombreProducto;

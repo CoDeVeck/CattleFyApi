@@ -31,8 +31,8 @@ public class RegistroSanitarioService {
     public ResultadoResponse<RegistroSanitarioResponse> crearRegistroUnificado(
             RegistroSanitarioRequest request) {
 
-        if (request.getQrLote() == null && request.getQrAnimal() == null) {
-            return ResultadoResponse.error("Se requiere el QR del Lote o del Animal.");
+        if (request.getQrAnimal() == null && request.getQrLote() == null && request.getIdLote() == null) {
+            return ResultadoResponse.error("Se requiere el QR del Animal, o el QR/ID del Lote.");
         }
 
         try {
@@ -42,9 +42,14 @@ public class RegistroSanitarioService {
             if (request.getQrAnimal() != null) {
                 animal = animalRepository.findByCodigoQr(request.getQrAnimal())
                         .orElseThrow(() -> new RuntimeException("Animal no encontrado"));
-            } else if (request.getQrLote() != null) {
+            }
+            else if (request.getIdLote() != null) {
+                lote = loteRepository.findById(request.getIdLote())
+                        .orElseThrow(() -> new RuntimeException("Lote por ID no encontrado"));
+            }
+            else if (request.getQrLote() != null) {
                 lote = loteRepository.findByCodigoQr(request.getQrLote())
-                        .orElseThrow(() -> new RuntimeException("Lote no encontrado"));
+                        .orElseThrow(() -> new RuntimeException("Lote por QR no encontrado"));
             }
 
             RegistroSanitario nuevoRegistro = new RegistroSanitario();
