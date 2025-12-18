@@ -27,10 +27,7 @@ public class VentaDetalleResponse {
     private BigDecimal precioPorKg;
     private BigDecimal precioTotal;
     
-    // ROI REAL: Calculado automáticamente basado en costos vs ingreso real
     private BigDecimal roiReal;
-   
-    // ROI OBJETIVO: El margen que el productor quería alcanzar (puede ser null)
     private BigDecimal roiObjetivo;
     
     // DIFERENCIA: Indica si cumplió, superó o no alcanzó su objetivo
@@ -39,12 +36,7 @@ public class VentaDetalleResponse {
     private String clienteNombre;
     private LocalDateTime fechaVenta;
     private Integer cantidadAnimalesVendidos;
-    private List<Integer> animalesVendidosIds;
-    
-    // Información adicional del lote
-    private String granjaId;
-    private String granjaNombre;
-    private String estadoLote;
+    private List<DetalleAnimalVendido> animalesVendidos;
     
     // Información financiera
     private BigDecimal costoTotalInvertido;

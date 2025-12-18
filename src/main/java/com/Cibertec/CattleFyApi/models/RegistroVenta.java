@@ -41,6 +41,9 @@ public class RegistroVenta {
 	    @Column(name = "roi_estimado")
 	    private BigDecimal roiEstimado;
 	    
+	    @Column(name = "roi_meta")
+	    private BigDecimal roiMeta;
+	    
 	    @Column(name = "cliente_nombre")
 	    private String clienteNombre;
 	    

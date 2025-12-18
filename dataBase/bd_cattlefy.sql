@@ -157,6 +157,7 @@ CREATE TABLE tb_registro_venta (
     precio_por_kg DECIMAL(10, 2),
     precio_total DECIMAL(10, 2) NOT NULL,
     roi_estimado DECIMAL(5, 2),
+	roi_meta DECIMAL(5,2),
     cliente_nombre VARCHAR(100),
     fecha_venta TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     animales_vendidos_ids INT[]
@@ -190,4 +191,3 @@ CREATE TABLE tb_notificaciones (
     leida BOOLEAN DEFAULT FALSE,
     descartada BOOLEAN DEFAULT FALSE
 );
-
