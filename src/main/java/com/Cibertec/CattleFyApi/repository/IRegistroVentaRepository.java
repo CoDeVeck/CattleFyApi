@@ -34,8 +34,18 @@ public interface IRegistroVentaRepository  extends JpaRepository<RegistroVenta, 
 		    @Param("fechaHasta") LocalDateTime fechaHasta
 		);
 
-
-
+	@Query("""
+		    SELECT COALESCE(AVG(v.roiEstimado), 0)
+		    FROM RegistroVenta v
+		    WHERE v.lote.granja.granjaId = :granjaId
+		      AND EXTRACT(YEAR FROM v.fechaVenta) = :anio
+		      AND EXTRACT(MONTH FROM v.fechaVenta) = :mes
+		""")
+		BigDecimal avgRoiByGranjaAndMes(
+		    @Param("granjaId") Integer granjaId,
+		    @Param("anio") Integer anio,
+		    @Param("mes") Integer mes
+		);
 	    
 	@Query("SELECT v FROM RegistroVenta v " +
 	           "JOIN FETCH v.lote l " +

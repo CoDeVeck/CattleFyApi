@@ -70,6 +70,26 @@ public class RegistroVentaService {
 
         return ventaRepository.sumarVentasPorRango(inicio, fin);
     }
+    
+    public Long totalAnimalesVendidos(Integer idGranja) {
+    	Long cant = animalRepository.totalAnimalesVendidos(idGranja);
+    	return cant;
+    }
+    
+    public BigDecimal obtenerIngresosTotalesMes(
+            Integer granjaId, int anio, int mes) {
+
+        LocalDateTime inicio = LocalDateTime.of(anio, mes, 1, 0, 0);
+        LocalDateTime fin = inicio.plusMonths(1);
+
+        return ventaRepository.sumIngresosByGranjaAndPeriodo(granjaId, inicio, fin);
+    }
+
+    public BigDecimal obtenerRoiPromedioMes(
+            Integer granjaId, int anio, int mes) {
+
+        return ventaRepository.avgRoiByGranjaAndMes(granjaId, anio, mes);
+    }
 
     public VentaDetalleResponse registrarVenta(RegistroVentaRequest request) {
 
