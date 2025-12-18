@@ -2,6 +2,7 @@ package com.Cibertec.CattleFyApi.service;
 
 import com.Cibertec.CattleFyApi.dto.CalculadoraPrecioRequest;
 import com.Cibertec.CattleFyApi.dto.CalculadoraPrecioResponse;
+import com.Cibertec.CattleFyApi.dto.DetalleAnimalVendido;
 import com.Cibertec.CattleFyApi.dto.LoteDisponibleVentaResponse;
 import com.Cibertec.CattleFyApi.dto.RegistroVentaRequest;
 import com.Cibertec.CattleFyApi.dto.VentaDetalleResponse;
@@ -71,27 +72,30 @@ public class RegistroVentaService {
     }
 
     public VentaDetalleResponse registrarVenta(RegistroVentaRequest request) {
-        
+
         Lote lote = validarLote(request.getLoteId());
-        
+
         List<Animal> animalesVivos = animalRepository.findByLoteAndEstado(lote, "Vivo");
         if (animalesVivos.isEmpty()) {
             throw new IllegalStateException("No hay animales vivos en el lote");
         }
-        
+
         validarTipoVenta(request, lote.getCategoria().getTipoLote(), animalesVivos.size());
         List<Animal> animalesAVender = obtenerAnimalesAVender(request, animalesVivos, lote);
-        
+
+        BigDecimal pesoTotalCalculado = calcularPesoTotalAnimales(animalesAVender);
+        request.setPesoTotalKg(pesoTotalCalculado);
+
         // ROI Real
         BigDecimal costoTotal = calcularCostoTotalLote(lote);
         BigDecimal roiReal = calcularROI(costoTotal, request.getPrecioTotal());
-        
-        validarPerdidas(roiReal, request.getRoiObjetivo(), costoTotal, request.getPesoTotalKg());
-        
+
+        validarPerdidas(roiReal, request.getRoiMeta(), costoTotal, request.getPesoTotalKg());
+
         RegistroVenta venta = crearYGuardarVenta(request, lote, roiReal, animalesAVender);
         actualizarEstados(animalesAVender, lote, "Total".equals(request.getTipoAlcanceVenta()));
-        
-        return construirVentaDetalle(venta, lote, animalesAVender, costoTotal, request.getRoiObjetivo());
+
+        return construirVentaDetalle(venta, lote, animalesAVender, costoTotal, request.getRoiMeta());
     }
     
     @Transactional(readOnly = true)
@@ -103,7 +107,7 @@ public class RegistroVentaService {
         List<Animal> animales = animalRepository.findAllById(Arrays.asList(venta.getAnimalesVendidosIds()));
         BigDecimal costoTotal = calcularCostoTotalLote(lote);
         
-        return construirVentaDetalle(venta, lote, animales, costoTotal, null);
+        return construirVentaDetalle(venta, lote, animales, costoTotal, venta.getRoiMeta());
     }
 
     @Transactional(readOnly = true)
@@ -237,6 +241,7 @@ public class RegistroVentaService {
         venta.setPrecioPorKg(request.getPrecioPorKg());
         venta.setPrecioTotal(request.getPrecioTotal());
         venta.setRoiEstimado(roiReal);
+        venta.setRoiMeta(request.getRoiMeta()); // ✅ GUARDAR EL ROI META
         venta.setClienteNombre(request.getClienteNombre());
         venta.setFechaVenta(LocalDateTime.now());
         venta.setAnimalesVendidosIds(animalesAVender.stream()
@@ -244,6 +249,22 @@ public class RegistroVentaService {
             .toArray(Integer[]::new));
         
         return ventaRepository.save(venta);
+    }
+    
+    private BigDecimal calcularPesoTotalAnimales(List<Animal> animales) {
+        BigDecimal pesoTotal = BigDecimal.ZERO;
+        
+        for (Animal animal : animales) {
+            if (animal.getPeso() != null) {
+                pesoTotal = pesoTotal.add(animal.getPeso());
+            }
+        }
+        
+        if (pesoTotal.compareTo(BigDecimal.ZERO) == 0) {
+            throw new IllegalStateException("Los animales seleccionados no tienen peso registrado");
+        }
+        
+        return pesoTotal;
     }
     
     private void actualizarEstados(List<Animal> animales, Lote lote, boolean esVentaTotal) {
@@ -276,6 +297,8 @@ public class RegistroVentaService {
             }
         }
         
+        List<DetalleAnimalVendido> animalesVendidosDetalle = construirDetalleAnimalesVendidos(animales, venta.getPrecioTotal());        
+        
         return VentaDetalleResponse.builder()
             .ventaId(venta.getVentaId())
             .loteId(lote.getLoteId())
@@ -293,15 +316,39 @@ public class RegistroVentaService {
             .clienteNombre(venta.getClienteNombre())
             .fechaVenta(venta.getFechaVenta())
             .cantidadAnimalesVendidos(animales.size())
-            .animalesVendidosIds(Arrays.asList(venta.getAnimalesVendidosIds()))
-            .granjaId(lote.getGranja().getGranjaId().toString())
-            .granjaNombre(lote.getGranja().getNombre())
-            .estadoLote(lote.getEstado())
+            .animalesVendidos(animalesVendidosDetalle)
             .costoTotalInvertido(costoTotal)
             .gananciaNeta(gananciaNeta)
             .advertencia(advertencia)
             .recomendacion(recomendacion)
             .build();
+    }
+    
+    private List<DetalleAnimalVendido> construirDetalleAnimalesVendidos(List<Animal> animales, BigDecimal precioTotalVenta) {
+        BigDecimal pesoTotalVendido = animales.stream()
+            .map(animal -> animal.getPeso() != null ? animal.getPeso() : BigDecimal.ZERO)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        if (pesoTotalVendido.compareTo(BigDecimal.ZERO) == 0) {
+            throw new IllegalStateException("El peso total de los animales vendidos es cero");
+        }
+        
+        return animales.stream()
+            .map(animal -> {
+                BigDecimal pesoAnimal = animal.getPeso() != null ? animal.getPeso() : BigDecimal.ZERO;
+                BigDecimal costoUnitario = pesoAnimal
+                    .divide(pesoTotalVendido, 4, RoundingMode.HALF_UP)
+                    .multiply(precioTotalVenta)
+                    .setScale(2, RoundingMode.HALF_UP);
+                
+                return DetalleAnimalVendido.builder()
+                    .idAnimal(animal.getAnimalId())
+                    .codigoQr(animal.getCodigoQr())
+                    .peso(pesoAnimal)
+                    .costoUnitario(costoUnitario)
+                    .build();
+            })
+            .collect(Collectors.toList());
     }
     
     private VentaListadoResponse construirVentaListado(RegistroVenta venta) {
@@ -317,8 +364,8 @@ public class RegistroVentaService {
             .especieNombre(venta.getLote().getEspecie().getNombre())
             .categoriaManejoNombre(venta.getLote().getCategoria().getNombre())
             .roiReal(venta.getRoiEstimado())
-            .roiObjetivo(null)
-            .cumplioObjetivo(null)
+            .roiObjetivo(venta.getRoiMeta())
+            .cumplioObjetivo(venta.getRoiMeta() != null ? venta.getRoiEstimado().compareTo(venta.getRoiMeta()) >= 0 : null)
             .cantidadAnimalesVivos(animalesVivos)
             .pesoPromedioLote(pesoPromedio)
             .sumaTotalPesos(venta.getPesoTotalKg())
@@ -359,7 +406,7 @@ public class RegistroVentaService {
             .sumaTotalPesos(sumaPesos)
             .costoTotalAcumulado(costoTotal)
             .precioSugeridoPorKgBase(precioSugerido)
-            .roiBasePorcentaje(new BigDecimal("30.00"))
+            .roiEstimadoPorcentaje(new BigDecimal("30.00"))
             .preciosPorRoiObjetivo(preciosPorRoi)
             .fechaCreacionLote(lote.getFechaCreacion())
             .diasEnProduccion((int) diasProduccion)
