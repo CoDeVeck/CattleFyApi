@@ -154,6 +154,11 @@ public class AnimalService {
         animal.setPeso(BigDecimal.valueOf(req.getPeso()));
         animal.setEstado("Vivo");
 
+        
+        if (req.getImagen() == null || req.getImagen().isEmpty()) {
+            throw new IllegalArgumentException("La imagen del animal es obligatoria.");
+        }
+
         log.info("Subiendo imagen a Cloudinary...");
         String carpeta = obtenerCarpetaPorEspecie(especieAsignada.getEspecieId());
         String imagenUrl = cloudinaryService.uploadImage(req.getImagen(), carpeta);

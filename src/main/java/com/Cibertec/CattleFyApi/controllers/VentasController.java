@@ -46,7 +46,30 @@ public class VentasController {
         BigDecimal totalVentas = ventaService.totalVentasPorMes(anio, mes);
         return ResponseEntity.ok(totalVentas);
     }
-	
+    
+    @GetMapping("/total-animales-vendidos/{idGranja}")
+    public ResponseEntity<Long> obtenerTotalAnimalesVendidos(@PathVariable Integer idGranja) {
+    	Long cantidad = ventaService.totalAnimalesVendidos(idGranja);
+        return ResponseEntity.ok(cantidad);
+    }
+    
+    @GetMapping("/ingresos-mensuales/{idGranja}")
+    public ResponseEntity<BigDecimal> ingresosMensuales(@PathVariable Integer idGranja,
+            @RequestParam int anio,
+            @RequestParam int mes) {
+        return ResponseEntity.ok(ventaService.obtenerIngresosTotalesMes(idGranja, anio, mes)
+        );
+    }
+    
+    @GetMapping("/roi-promedio-mensual/{idGranja}")
+    public ResponseEntity<BigDecimal> roiPromedioMensual(@PathVariable Integer idGranja,
+            @RequestParam int anio,
+            @RequestParam int mes) {
+
+        return ResponseEntity.ok(ventaService.obtenerRoiPromedioMes(idGranja, anio, mes)
+        );
+    }
+    
     @PostMapping("/venta")
     public ResponseEntity<VentaDetalleResponse> registrarVenta(@RequestBody RegistroVentaRequest request) {
         
