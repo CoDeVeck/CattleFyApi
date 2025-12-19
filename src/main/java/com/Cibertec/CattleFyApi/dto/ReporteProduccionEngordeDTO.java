@@ -1,10 +1,14 @@
 package com.Cibertec.CattleFyApi.dto;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+import java.math.BigDecimal;
+
+@Setter @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReporteProduccionEngordeDTO {
 
-    private double precio_promedio;
-    private double ganancia_kg;
+    private BigDecimal peso_promedio;
+    private BigDecimal ganancia_kg;
 }
