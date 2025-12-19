@@ -191,4 +191,93 @@ public interface IRegistroProduccionRepository  extends JpaRepository<RegistroPr
             @Param("fecha_fin") String fecha_fin
     );
 
+
+    @Query(value= """
+             SELECT
+                    c.categoria,
+                    c.total
+                FROM (
+                    SELECT
+                        'Sanidad' AS categoria,
+                        COALESCE(SUM(
+                            CASE
+                                WHEN rs.tipo_aplicacion = 'Individual'
+                                    THEN rs.costo_por_dosis * rs.cantidad_dosis
+                                WHEN rs.tipo_aplicacion = 'Masivo'
+                                    THEN rs.costo_por_dosis * rs.cantidad_dosis * rs.animales_tratados
+                            END
+                        ), 0) AS total
+                    FROM tb_registro_sanitario rs
+                    WHERE (:lote_id IS NULL OR rs.lote_id = :lote_id)
+                      AND (:fecha_inicio IS NULL OR rs.fecha_aplicacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+                        AND (:fecha_fin IS NULL OR rs.fecha_aplicacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+            
+                    UNION ALL
+            
+                    -- COSTO ALIMENTACIÓN
+                    SELECT
+                        'Alimentación' AS categoria,
+                        COALESCE(SUM(ra.cantidad_kg * ra.costo_por_kg), 0) AS total
+                    FROM tb_registro_alimentacion ra
+                    WHERE (:lote_id IS NULL OR ra.lote_id = :lote_id)
+                      AND (:fecha_inicio IS NULL OR ra.fecha_registro >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+                        AND (:fecha_fin IS NULL OR ra.fecha_registro <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+            
+                    UNION ALL
+            
+                    -- COSTO COMPRAS
+                    SELECT
+                        'Compras' AS categoria,
+                        COALESCE(SUM(rc.costo_total), 0) AS total
+                    FROM tb_granjas gr
+                    INNER JOIN tb_lotes lt ON lt.granja_id = gr.granja_id
+                    INNER JOIN tb_registro_compra rc ON rc.lote_id = lt.lote_id
+                    WHERE (:granja_id IS NULL OR gr.granja_id = :granja_id)
+                      AND (:lote_id IS NULL OR rc.lote_id = :lote_id)
+                     AND (:fecha_inicio IS NULL OR rc.fecha_compra >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+                    AND (:fecha_fin IS NULL OR rc.fecha_compra <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+                ) c;
+            """,nativeQuery = true)
+    List<Grafico3>distribucionDeGastos(
+            @Param("granja_id") Integer granjaId,
+            @Param("lote_id") Integer loteId,
+            @Param("fecha_inicio") String fechaInicio,
+            @Param("fecha_fin") String fechaFin
+    );
+
+
+
+    @Query(value = """
+    SELECT 
+        SUM(rs.cantidad_dosis) AS cantidad_total_dosis,
+        SUM(rs.costo_por_dosis * rs.cantidad_dosis) AS costo_total,
+        SUM(rs.animales_tratados) AS animales_tratados,
+
+        (
+            SELECT rs2.nombre_producto
+            FROM tb_registro_sanitario rs2 
+            WHERE (:lote_id IS NULL OR rs2.lote_id = :lote_id)
+           AND (:fecha_inicio IS NULL OR rs2.fecha_aplicacacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+            AND (:fecha_fin IS NULL OR rs2.fecha_aplicacacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+            GROUP BY rs2.nombre_producto
+            ORDER BY rs2.nombre_producto
+            LIMIT 1
+        ) AS medicamento_mas_usado
+
+    FROM tb_granjas gr
+    INNER JOIN tb_lotes lt ON lt.granja_id = gr.granja_id
+    INNER JOIN tb_registro_sanitario rs ON rs.lote_id = lt.lote_id
+
+    WHERE (:granja_id IS NULL OR gr.granja_id = :granja_id)
+      AND (:lote_id IS NULL OR lt.lote_id = :lote_id)
+      AND rs.protocolo_tipo = 'Tratamiento'
+       AND (:fecha_inicio IS NULL OR rs.fecha_aplicacacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+        AND (:fecha_fin IS NULL OR rs.fecha_aplicacacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+    """, nativeQuery = true)
+    SanidadEstadisticasDTO obtenerEstadisticasSanidad(
+            @Param("granja_id") Integer granjaId,
+            @Param("lote_id") Integer loteId,
+            @Param("fecha_inicio") String fechaInicio,
+            @Param("fecha_fin") String fechaFin
+    );
 }

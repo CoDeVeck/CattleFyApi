@@ -115,5 +115,17 @@ public class RegistroProduccionController {
                 registroProduccionService.reporteFinanciero(granja_id,lote_id,fecha_inicio,fecha_fin);
         return ResponseEntity.ok(listafinaciero);
     }
-    
+
+    @GetMapping("/grafico3/{granja_id}/distribucion")
+    public ResponseEntity<List<Grafico3>>Grafico3(
+            @PathVariable("granja_id")Integer granja_id,
+            @RequestParam(required = false) Integer lote_id,
+            @RequestParam(required = false) String fecha_inicio,
+            @RequestParam(required = false) String fecha_fin
+    ){
+      List<Grafico3> grafico3 = registroProduccionService.distribucionDeGastos(granja_id,lote_id,fecha_inicio,fecha_fin);
+
+      return ResponseEntity.ok(grafico3);
+    }
+
 }
