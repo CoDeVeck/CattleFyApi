@@ -1,9 +1,6 @@
 package com.Cibertec.CattleFyApi.service;
 
-import com.Cibertec.CattleFyApi.dto.RegistroProduccionRequest;
-import com.Cibertec.CattleFyApi.dto.RegistroProduccionResponse;
-import com.Cibertec.CattleFyApi.dto.ReporteProduccionEngordeDTO;
-import com.Cibertec.CattleFyApi.dto.ResultadoResponse;
+import com.Cibertec.CattleFyApi.dto.*;
 import com.Cibertec.CattleFyApi.models.Lote;
 import com.Cibertec.CattleFyApi.models.RegistroProduccion;
 import com.Cibertec.CattleFyApi.repository.ILoteRepository;
@@ -74,6 +71,12 @@ public class RegistroProduccionService {
     public List<ReporteProduccionEngordeDTO> ListaReporteProduccion(
             Integer granja_id, Integer lote_id, Integer categoria_id, String fecha_inicio, String fecha_fin){
         return registroProduccionRepository.listaDeProduccion(granja_id, lote_id, categoria_id, fecha_inicio, fecha_fin);
+    }
+
+    public List<ReporteGrafico1> GraficoReporte(
+            Integer granja_id, Integer lote_id, Integer categoria_id, String fecha_inicio, String fecha_fin
+    ){
+        return registroProduccionRepository.graficoUnoReporteProduccio(granja_id, lote_id, categoria_id, fecha_inicio, fecha_fin);
     }
 
 }
