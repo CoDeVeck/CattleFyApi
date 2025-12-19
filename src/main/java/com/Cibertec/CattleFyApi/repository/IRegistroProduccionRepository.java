@@ -1,9 +1,6 @@
 package com.Cibertec.CattleFyApi.repository;
 
-import com.Cibertec.CattleFyApi.dto.ReporteGrafico1;
-import com.Cibertec.CattleFyApi.dto.ReporteProduccionEngordeDTO;
-import com.Cibertec.CattleFyApi.dto.ReporteProduccionReproduccion;
-import com.Cibertec.CattleFyApi.dto.ReporteTotalAnimalesLecheDto;
+import com.Cibertec.CattleFyApi.dto.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.Cibertec.CattleFyApi.models.RegistroProduccion;
@@ -104,4 +101,94 @@ public interface IRegistroProduccionRepository  extends JpaRepository<RegistroPr
             @Param("fecha_inicio")String fecha_inicio,
             @Param("fecha_fin") String fecha_fin
     );
+
+    @Query(value = """
+            SELECT
+                DATE(pr.fecha_registro) AS fecha,
+                pr.tipo_produccion,
+                SUM(pr.cantidad) AS cantidad_total
+            
+            FROM tb_granjas gr
+            INNER JOIN tb_lotes lt ON lt.granja_id = gr.granja_id
+            INNER JOIN tb_registro_produccion pr ON pr.lote_id = lt.lote_id
+            
+            WHERE (:granja_id IS NULL OR gr.granja_id = :granja_id)
+                AND (:lote_id IS NULL OR lt.lote_id = :lote_id)
+                AND (:fecha_inicio IS NULL OR pr.fecha_registro >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+                AND (:fecha_fin IS NULL OR pr.fecha_registro <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+              AND pr.tipo_produccion IN ('Leche','Huevos')
+            GROUP BY DATE(pr.fecha_registro), pr.tipo_produccion
+            ORDER BY fecha ASC;
+            """, nativeQuery = true)
+    List<ReporteGrafico2> Grafico2List(
+            @Param("granja_id") Integer granja_id,
+            @Param("lote_id") Integer lote_id,
+            @Param("fecha_inicio")String fecha_inicio,
+            @Param("fecha_fin") String fecha_fin
+    );
+
+
+    @Query(value = """
+            SELECT
+            
+                COALESCE((
+                    SELECT SUM(vt.precio_total)
+                    FROM tb_registro_venta vt
+                    INNER JOIN tb_lotes lt2 ON lt2.lote_id = vt.lote_id
+                    WHERE lt2.lote_id = lt.lote_id
+            		AND (:fecha_inicio IS NULL OR lt.fecha_creacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+                    AND (:fecha_fin IS NULL OR lt.fecha_creacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+                ), 0) AS ingresos,
+            
+            
+                COALESCE((
+                    SELECT SUM(rc.costo_total)
+                    FROM tb_registro_compra rc
+                    WHERE rc.lote_id = lt.lote_id
+            		AND (:fecha_inicio IS NULL OR lt.fecha_creacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+                    AND (:fecha_fin IS NULL OR lt.fecha_creacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+                ), 0) AS costo_compras,
+            
+            
+                COALESCE((
+                    SELECT SUM(ra.cantidad_kg * ra.costo_por_kg)
+                    FROM tb_registro_alimentacion ra
+                    WHERE ra.lote_id = lt.lote_id
+            		AND (:fecha_inicio IS NULL OR lt.fecha_creacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+                    AND (:fecha_fin IS NULL OR lt.fecha_creacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+                ), 0) AS costo_alimentacion,
+            
+            
+                COALESCE((
+                    SELECT SUM(
+                        CASE
+                            WHEN rs.tipo_aplicacion = 'Individual'
+                                THEN rs.costo_por_dosis * rs.cantidad_dosis
+                            WHEN rs.tipo_aplicacion = 'Masivo'
+                                THEN rs.costo_por_dosis * rs.cantidad_dosis * rs.animales_tratados
+                        END
+                    )
+                    FROM tb_registro_sanitario rs
+                    WHERE rs.lote_id = lt.lote_id
+            		AND (:fecha_inicio IS NULL OR lt.fecha_creacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+                    AND (:fecha_fin IS NULL OR lt.fecha_creacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+                ), 0) AS costo_sanitario
+            
+            FROM tb_granjas gr
+            INNER JOIN tb_lotes lt ON lt.granja_id = gr.granja_id
+            
+            WHERE (:granja_id IS NULL OR gr.granja_id = :granja_id)
+                AND (:lote_id IS NULL OR lt.lote_id = :lote_id)
+                AND (:fecha_inicio IS NULL OR lt.fecha_creacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+                AND (:fecha_fin IS NULL OR lt.fecha_creacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+            
+            
+            """, nativeQuery = true)
+    List<ReporteFinancieroDTO>reporteFinanciero(
+            @Param("granja_id") Integer granja_id,
+            @Param("lote_id") Integer lote_id,
+            @Param("fecha_inicio")String fecha_inicio,
+            @Param("fecha_fin") String fecha_fin
+    );
+
 }

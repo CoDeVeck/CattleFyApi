@@ -91,4 +91,29 @@ public class RegistroProduccionController {
 
         return ResponseEntity.ok(lsita);
     }
+
+    @GetMapping("/grafico2/{granja_id}/reproduccion")
+    public  ResponseEntity<List<ReporteGrafico2>>lista3 (
+            @PathVariable("granja_id")Integer granja_id,
+            @RequestParam(required = false) Integer lote_id,
+            @RequestParam(required = false) String fecha_inicio,
+            @RequestParam(required = false) String fecha_fin
+    ){
+        List<ReporteGrafico2> lista =
+                registroProduccionService.GraficoReporte2(granja_id,lote_id,fecha_inicio,fecha_fin);
+        return ResponseEntity.ok(lista);
+    }
+
+    @GetMapping("/reporte/{granja_id}/financiero")
+    public  ResponseEntity<List<ReporteFinancieroDTO>>lista4(
+            @PathVariable("granja_id")Integer granja_id,
+            @RequestParam(required = false) Integer lote_id,
+            @RequestParam(required = false) String fecha_inicio,
+            @RequestParam(required = false) String fecha_fin
+    ){
+        List<ReporteFinancieroDTO>listafinaciero =
+                registroProduccionService.reporteFinanciero(granja_id,lote_id,fecha_inicio,fecha_fin);
+        return ResponseEntity.ok(listafinaciero);
+    }
+    
 }

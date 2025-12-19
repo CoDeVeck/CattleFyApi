@@ -89,4 +89,12 @@ public class RegistroProduccionService {
         return registroProduccionRepository.ListaProduccionReproduccion(granja_id, lote_id, categoria_id, fecha_inicio, fecha_fin);
     }
 
+    public List<ReporteGrafico2>GraficoReporte2( Integer granja_id, Integer lote_id, String fecha_inicio, String fecha_fin){
+        return registroProduccionRepository.Grafico2List(granja_id, lote_id, fecha_inicio, fecha_fin);
+    }
+
+    public List<ReporteFinancieroDTO>reporteFinanciero(Integer granja_id, Integer lote_id, String fecha_inicio, String fecha_fin){
+        return registroProduccionRepository.reporteFinanciero(granja_id, lote_id, fecha_inicio, fecha_fin);
+    }
+
 }
