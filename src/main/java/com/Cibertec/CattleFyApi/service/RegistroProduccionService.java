@@ -2,6 +2,7 @@ package com.Cibertec.CattleFyApi.service;
 
 import com.Cibertec.CattleFyApi.dto.RegistroProduccionRequest;
 import com.Cibertec.CattleFyApi.dto.RegistroProduccionResponse;
+import com.Cibertec.CattleFyApi.dto.ReporteProduccionEngordeDTO;
 import com.Cibertec.CattleFyApi.dto.ResultadoResponse;
 import com.Cibertec.CattleFyApi.models.Lote;
 import com.Cibertec.CattleFyApi.models.RegistroProduccion;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,6 +24,7 @@ public class RegistroProduccionService {
 
     private final IRegistroProduccionRepository registroProduccionRepository;
     private final ILoteRepository loteRepository;
+
     public List<RegistroProduccion> getAll(){
         return registroProduccionRepository.findAll();
     }
@@ -63,6 +66,14 @@ public class RegistroProduccionService {
         dto.setCantidad(p.getCantidad());
 
         return dto;
+    }
+
+
+    //Reportes
+
+    public List<ReporteProduccionEngordeDTO> ListaReporteProduccion(
+            Integer granja_id, Integer lote_id, Integer categoria_id, String fecha_inicio, String fecha_fin){
+        return registroProduccionRepository.listaDeProduccion(granja_id, lote_id, categoria_id, fecha_inicio, fecha_fin);
     }
 
 }
