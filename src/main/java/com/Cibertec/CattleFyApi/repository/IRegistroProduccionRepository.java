@@ -280,4 +280,32 @@ public interface IRegistroProduccionRepository  extends JpaRepository<RegistroPr
             @Param("fecha_inicio") String fechaInicio,
             @Param("fecha_fin") String fechaFin
     );
+
+
+    @Query(value = """
+             SELECT
+                    rs.protocolo_tipo,
+                    rs.lote_id,
+                    rs.animal_id,
+                    rs.costo_por_dosis,
+                    rs.fecha_aplicacion::date AS fecha_aplicacio
+            
+                FROM tb_granjas gr
+                INNER JOIN tb_lotes lt ON lt.granja_id = gr.granja_id
+                INNER JOIN tb_registro_sanitario rs ON rs.lote_id = lt.lote_id
+            
+                WHERE (:granja_id IS NULL OR gr.granja_id = :granja_id)
+                  AND (:lote_id IS NULL OR lt.lote_id = :lote_id)
+                  AND (:protocolo_tipo IS NULL OR rs.protocolo_tipo = :protocolo_tipo)
+                  AND (:fecha_inicio IS NULL OR rs.fecha_aplicacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+                  AND (:fecha_fin IS NULL OR rs.fecha_aplicacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+                ORDER BY rs.fecha_aplicacion DESC
+            """, nativeQuery = true)
+    List<AplicacionesRecientesDTO>listaAplicacionRecientes(
+            @Param("granja_id") Integer granjaId,
+            @Param("lote_id") Integer loteId,
+            @Param("protocolo_tipo")String protocolo_tipo,
+            @Param("fecha_inicio") String fechaInicio,
+            @Param("fecha_fin") String fechaFin
+    );
 }

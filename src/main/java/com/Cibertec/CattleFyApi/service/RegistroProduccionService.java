@@ -104,4 +104,8 @@ public class RegistroProduccionService {
     public SanidadEstadisticasDTO sanidadEstadisticasDTO(Integer granja_id, Integer lote_id, String fecha_inicio, String fecha_fin ){
         return registroProduccionRepository.obtenerEstadisticasSanidad(granja_id,lote_id,fecha_inicio,fecha_fin);
     }
+
+    public List<AplicacionesRecientesDTO> listaAplicacionRecientes(Integer granja_id, Integer lote_id,String protocolo_tipo, String fecha_inicio, String fecha_fin){
+        return registroProduccionRepository.listaAplicacionRecientes(granja_id,lote_id,protocolo_tipo,fecha_inicio,fecha_fin);
+    }
 }
