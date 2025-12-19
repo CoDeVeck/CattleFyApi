@@ -89,4 +89,23 @@ public class RegistroProduccionService {
         return registroProduccionRepository.ListaProduccionReproduccion(granja_id, lote_id, categoria_id, fecha_inicio, fecha_fin);
     }
 
+    public List<ReporteGrafico2>GraficoReporte2( Integer granja_id, Integer lote_id, String fecha_inicio, String fecha_fin){
+        return registroProduccionRepository.Grafico2List(granja_id, lote_id, fecha_inicio, fecha_fin);
+    }
+
+    public List<ReporteFinancieroDTO>reporteFinanciero(Integer granja_id, Integer lote_id, String fecha_inicio, String fecha_fin){
+        return registroProduccionRepository.reporteFinanciero(granja_id, lote_id, fecha_inicio, fecha_fin);
+    }
+
+    public List<Grafico3>distribucionDeGastos(Integer granja_id, Integer lote_id, String fecha_inicio, String fecha_fin){
+        return  registroProduccionRepository.distribucionDeGastos(granja_id,lote_id,fecha_inicio,fecha_fin);
+    }
+
+    public SanidadEstadisticasDTO sanidadEstadisticasDTO(Integer granja_id, Integer lote_id, String fecha_inicio, String fecha_fin ){
+        return registroProduccionRepository.obtenerEstadisticasSanidad(granja_id,lote_id,fecha_inicio,fecha_fin);
+    }
+
+    public List<AplicacionesRecientesDTO> listaAplicacionRecientes(Integer granja_id, Integer lote_id,String protocolo_tipo, String fecha_inicio, String fecha_fin){
+        return registroProduccionRepository.listaAplicacionRecientes(granja_id,lote_id,protocolo_tipo,fecha_inicio,fecha_fin);
+    }
 }
