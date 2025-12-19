@@ -257,8 +257,8 @@ public interface IRegistroProduccionRepository  extends JpaRepository<RegistroPr
             SELECT rs2.nombre_producto
             FROM tb_registro_sanitario rs2 
             WHERE (:lote_id IS NULL OR rs2.lote_id = :lote_id)
-           AND (:fecha_inicio IS NULL OR rs2.fecha_aplicacacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
-            AND (:fecha_fin IS NULL OR rs2.fecha_aplicacacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+           AND (:fecha_inicio IS NULL OR rs2.fecha_aplicacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+            AND (:fecha_fin IS NULL OR rs2.fecha_aplicacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
             GROUP BY rs2.nombre_producto
             ORDER BY rs2.nombre_producto
             LIMIT 1
@@ -271,8 +271,8 @@ public interface IRegistroProduccionRepository  extends JpaRepository<RegistroPr
     WHERE (:granja_id IS NULL OR gr.granja_id = :granja_id)
       AND (:lote_id IS NULL OR lt.lote_id = :lote_id)
       AND rs.protocolo_tipo = 'Tratamiento'
-       AND (:fecha_inicio IS NULL OR rs.fecha_aplicacacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
-        AND (:fecha_fin IS NULL OR rs.fecha_aplicacacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
+       AND (:fecha_inicio IS NULL OR rs.fecha_aplicacion >= TO_DATE(:fecha_inicio, 'YYYY-MM-DD'))
+        AND (:fecha_fin IS NULL OR rs.fecha_aplicacion <= TO_DATE(:fecha_fin, 'YYYY-MM-DD'))
     """, nativeQuery = true)
     SanidadEstadisticasDTO obtenerEstadisticasSanidad(
             @Param("granja_id") Integer granjaId,

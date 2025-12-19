@@ -128,4 +128,15 @@ public class RegistroProduccionController {
       return ResponseEntity.ok(grafico3);
     }
 
+    @GetMapping("/reporte/{granja_id}/sanidad")
+    public ResponseEntity<SanidadEstadisticasDTO> reportesSanitdad(
+            @PathVariable("granja_id")Integer granja_id,
+            @RequestParam(required = false) Integer lote_id,
+            @RequestParam(required = false) String fecha_inicio,
+            @RequestParam(required = false) String fecha_fin
+    ){
+        SanidadEstadisticasDTO sanidad = registroProduccionService.sanidadEstadisticasDTO(granja_id,lote_id,fecha_inicio, fecha_fin);
+
+        return ResponseEntity.ok(sanidad);
+    }
 }

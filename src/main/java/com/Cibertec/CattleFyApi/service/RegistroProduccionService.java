@@ -100,4 +100,8 @@ public class RegistroProduccionService {
     public List<Grafico3>distribucionDeGastos(Integer granja_id, Integer lote_id, String fecha_inicio, String fecha_fin){
         return  registroProduccionRepository.distribucionDeGastos(granja_id,lote_id,fecha_inicio,fecha_fin);
     }
+
+    public SanidadEstadisticasDTO sanidadEstadisticasDTO(Integer granja_id, Integer lote_id, String fecha_inicio, String fecha_fin ){
+        return registroProduccionRepository.obtenerEstadisticasSanidad(granja_id,lote_id,fecha_inicio,fecha_fin);
+    }
 }
