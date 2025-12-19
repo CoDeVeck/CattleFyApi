@@ -79,4 +79,8 @@ public class RegistroProduccionService {
         return registroProduccionRepository.graficoUnoReporteProduccio(granja_id, lote_id, categoria_id, fecha_inicio, fecha_fin);
     }
 
+    public List<ReporteTotalAnimalesLecheDto>ListaAnimalLeche(Integer granjaId){
+        return registroProduccionRepository.totalAnimalesLeches(granjaId);
+    }
+
 }

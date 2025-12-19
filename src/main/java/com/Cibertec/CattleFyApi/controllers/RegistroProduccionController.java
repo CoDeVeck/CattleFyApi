@@ -3,6 +3,7 @@ package com.Cibertec.CattleFyApi.controllers;
 import com.Cibertec.CattleFyApi.dto.LoteSimpleDTO;
 import com.Cibertec.CattleFyApi.dto.ReporteGrafico1;
 import com.Cibertec.CattleFyApi.dto.ReporteProduccionEngordeDTO;
+import com.Cibertec.CattleFyApi.dto.ReporteTotalAnimalesLecheDto;
 import com.Cibertec.CattleFyApi.models.RegistroProduccion;
 import com.Cibertec.CattleFyApi.service.LoteService;
 import com.Cibertec.CattleFyApi.service.RegistroProduccionService;
@@ -69,6 +70,15 @@ public class RegistroProduccionController {
                 loteService.obtenerLorePorGranja(granjaId);
 
         return ResponseEntity.ok(lote);
+    }
+
+    @GetMapping("/cantidad/{granjaId}")
+    public ResponseEntity<List<ReporteTotalAnimalesLecheDto>>cantidad(
+            @PathVariable("granjaId") Integer granjaId
+    ){
+        List<ReporteTotalAnimalesLecheDto> canmtidad =
+                registroProduccionService.ListaAnimalLeche(granjaId);
+        return  ResponseEntity.ok(canmtidad);
     }
 
 }
