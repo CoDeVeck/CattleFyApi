@@ -153,4 +153,8 @@ public class LoteService {
 
         return convertToDto(lote);
     }
+
+    public List<LoteSimpleDTO> obtenerLorePorGranja(Integer granjaId){
+        return loteRepository.listaLotePorGranja(granjaId);
+    }
 }

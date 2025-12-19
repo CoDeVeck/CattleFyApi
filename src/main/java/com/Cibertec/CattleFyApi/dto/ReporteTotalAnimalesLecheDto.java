@@ -6,12 +6,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
-@Getter @Setter
+@Setter @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReporteGrafico1 {
-    private LocalDate fecha;
-    private BigDecimal peso_kg;
+public class ReporteTotalAnimalesLecheDto {
+    private long total_animales;
+    private BigDecimal total_de_leche;
 }

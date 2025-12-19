@@ -4,11 +4,14 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import com.Cibertec.CattleFyApi.dto.LoteSimpleDTO;
+import com.Cibertec.CattleFyApi.dto.ReporteTotalAnimalesLecheDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.Cibertec.CattleFyApi.models.Lote;
+import org.springframework.web.bind.annotation.PathVariable;
 
 public interface ILoteRepository  extends JpaRepository<Lote, Integer>{
 
@@ -51,5 +54,21 @@ public interface ILoteRepository  extends JpaRepository<Lote, Integer>{
      );
      
      List<Lote> findByGranjaGranjaIdAndEstado(Integer granjaId, String estado);
-    
+
+
+     @Query(value = """
+             Select
+             	lt.lote_id,
+             	lt.nombre
+             FROM tb_granjas gr
+             Inner Join tb_lotes lt ON lt.granja_id = gr.granja_id
+             where gr.granja_id = :granjaId
+             
+             """, nativeQuery = true)
+    List<LoteSimpleDTO> listaLotePorGranja(
+            @Param("granjaId") Integer granjaId);
+
+
+
+
 }
