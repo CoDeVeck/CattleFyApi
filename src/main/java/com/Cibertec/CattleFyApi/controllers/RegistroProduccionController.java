@@ -1,9 +1,6 @@
 package com.Cibertec.CattleFyApi.controllers;
 
-import com.Cibertec.CattleFyApi.dto.LoteSimpleDTO;
-import com.Cibertec.CattleFyApi.dto.ReporteGrafico1;
-import com.Cibertec.CattleFyApi.dto.ReporteProduccionEngordeDTO;
-import com.Cibertec.CattleFyApi.dto.ReporteTotalAnimalesLecheDto;
+import com.Cibertec.CattleFyApi.dto.*;
 import com.Cibertec.CattleFyApi.models.RegistroProduccion;
 import com.Cibertec.CattleFyApi.service.LoteService;
 import com.Cibertec.CattleFyApi.service.RegistroProduccionService;
@@ -81,4 +78,17 @@ public class RegistroProduccionController {
         return  ResponseEntity.ok(canmtidad);
     }
 
+    @GetMapping("/reporte/reproduccion/{granja_id}")
+    public ResponseEntity<List<ReporteProduccionReproduccion>>lista(
+            @PathVariable("granja_id")Integer granja_id,
+            @RequestParam(required = false) Integer lote_id,
+            @RequestParam(required = false) Integer categoria_id,
+            @RequestParam(required = false) String fecha_inicio,
+            @RequestParam(required = false) String fecha_fin
+    ){
+        List<ReporteProduccionReproduccion> lsita =
+                registroProduccionService.ListaProduccionReproduccion(granja_id,lote_id,categoria_id,fecha_inicio,fecha_fin);
+
+        return ResponseEntity.ok(lsita);
+    }
 }

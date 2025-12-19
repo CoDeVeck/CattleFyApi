@@ -83,4 +83,10 @@ public class RegistroProduccionService {
         return registroProduccionRepository.totalAnimalesLeches(granjaId);
     }
 
+    public List<ReporteProduccionReproduccion>ListaProduccionReproduccion(
+            Integer granja_id, Integer lote_id, Integer categoria_id, String fecha_inicio, String fecha_fin
+    ){
+        return registroProduccionRepository.ListaProduccionReproduccion(granja_id, lote_id, categoria_id, fecha_inicio, fecha_fin);
+    }
+
 }
