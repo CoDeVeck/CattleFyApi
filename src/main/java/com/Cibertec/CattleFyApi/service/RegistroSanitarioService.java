@@ -68,10 +68,7 @@ public class RegistroSanitarioService {
             nuevoRegistro.setNombreProducto(request.getNombreProducto());
             nuevoRegistro.setCostoPorDosis(request.getCostoPorDosis());
             nuevoRegistro.setCantidadDosis(request.getCantidadDosis());
-            int animalesTratados = (animal != null)
-                    ? 1
-                    : request.getAnimalesTratados();
-            nuevoRegistro.setAnimalesTratados(animalesTratados);
+            nuevoRegistro.setAnimalesTratados(request.getAnimalesTratados());
             nuevoRegistro.setFechaAplicacion(LocalDateTime.now());
 
             RegistroSanitario registroGuardado = registroSanitarioRepository.save(nuevoRegistro);
