@@ -12,8 +12,10 @@ import com.Cibertec.CattleFyApi.models.Animal;
 import com.Cibertec.CattleFyApi.models.Lote;
 
 public interface IAnimalRepository extends JpaRepository<Animal, Integer>{
+    @Query("SELECT COUNT(a) FROM Animal a WHERE a.lote.loteId = :loteId")
+    Integer contarAnimalesPorLote(@Param("loteId") Integer loteId);
 
-	@Query("""
+    @Query("""
 			
 			SELECT COUNT(a) FROM Animal a
 			WHERE a.estado = 'Vendido' AND

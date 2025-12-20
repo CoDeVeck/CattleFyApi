@@ -10,4 +10,5 @@ public class LoteSimpleDTO {
 
     private Integer loteId;
     private String nombre;
+    private Integer cantidadAnimales;
 }

@@ -63,7 +63,8 @@ public class LoteService {
         return lotes.stream()
                 .map(l -> new LoteSimpleDTO(
                         l.getLoteId(),
-                        l.getNombre()
+                        l.getNombre(),
+                        animalRepository.contarAnimalesPorLote(l.getLoteId())
                 ))
                 .toList();
     }

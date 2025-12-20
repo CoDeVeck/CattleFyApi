@@ -31,26 +31,34 @@ public class RegistroSanitarioService {
     public ResultadoResponse<RegistroSanitarioResponse> crearRegistroUnificado(
             RegistroSanitarioRequest request) {
 
-        if (request.getQrAnimal() == null && request.getQrLote() == null && request.getIdLote() == null) {
-            return ResultadoResponse.error("Se requiere el QR del Animal, o el QR/ID del Lote.");
+        if (request.getQrAnimal() == null && request.getQrLote() == null && request.getIdLote() == null && request.getIdAnimal() == null) {
+            return ResultadoResponse.error("Se requiere el QR/ID del Animal, o el QR/ID del Lote.");
         }
 
         try {
             Lote lote = null;
             Animal animal = null;
 
-            if (request.getQrAnimal() != null) {
+            if (request.getIdAnimal() != null) {
+                animal = animalRepository.findById(request.getIdAnimal())
+                        .orElseThrow(() -> new RuntimeException("Animal ID no encontrado"));
+            }
+
+            if (request.getQrAnimal() != null && animal == null) {
                 animal = animalRepository.findByCodigoQr(request.getQrAnimal())
                         .orElseThrow(() -> new RuntimeException("Animal no encontrado"));
             }
-            else if (request.getIdLote() != null) {
+
+            if (request.getIdLote() != null) {
                 lote = loteRepository.findById(request.getIdLote())
                         .orElseThrow(() -> new RuntimeException("Lote por ID no encontrado"));
             }
-            else if (request.getQrLote() != null) {
+
+            if (request.getQrLote() != null && lote == null) {
                 lote = loteRepository.findByCodigoQr(request.getQrLote())
                         .orElseThrow(() -> new RuntimeException("Lote por QR no encontrado"));
             }
+
 
             RegistroSanitario nuevoRegistro = new RegistroSanitario();
             nuevoRegistro.setLote(lote);
@@ -60,14 +68,17 @@ public class RegistroSanitarioService {
             nuevoRegistro.setNombreProducto(request.getNombreProducto());
             nuevoRegistro.setCostoPorDosis(request.getCostoPorDosis());
             nuevoRegistro.setCantidadDosis(request.getCantidadDosis());
-            nuevoRegistro.setAnimalesTratados(request.getAnimalesTratados());
+            int animalesTratados = (animal != null)
+                    ? 1
+                    : request.getAnimalesTratados();
+            nuevoRegistro.setAnimalesTratados(animalesTratados);
             nuevoRegistro.setFechaAplicacion(LocalDateTime.now());
 
             RegistroSanitario registroGuardado = registroSanitarioRepository.save(nuevoRegistro);
 
             RegistroSanitarioResponse responseDto = mapToResponse(registroGuardado);
 
-            String mensajeExito = (request.getQrAnimal() != null)
+            String mensajeExito = (animal != null)
                     ? "Registro sanitario para el animal creado exitosamente."
                     : "Registro sanitario masivo para el lote creado exitosamente.";
 
