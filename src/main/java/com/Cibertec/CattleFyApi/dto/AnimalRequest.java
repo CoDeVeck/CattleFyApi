@@ -18,6 +18,7 @@ public class AnimalRequest {
     private String sexo;
     private Double peso;
     private Double precioCompra;
+    private String proveedor;
 
 
 }

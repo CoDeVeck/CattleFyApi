@@ -1,6 +1,7 @@
 package com.Cibertec.CattleFyApi.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,23 +14,11 @@ import com.Cibertec.CattleFyApi.dto.AnimalPesoReq;
 import com.Cibertec.CattleFyApi.dto.AnimalRequest;
 import com.Cibertec.CattleFyApi.dto.AnimalResponse;
 import com.Cibertec.CattleFyApi.dto.AnimalTrasReq;
-import com.Cibertec.CattleFyApi.models.Especie;
+import com.Cibertec.CattleFyApi.models.*;
+import com.Cibertec.CattleFyApi.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.Cibertec.CattleFyApi.models.Animal;
-import com.Cibertec.CattleFyApi.models.Lote;
-import com.Cibertec.CattleFyApi.models.RegistroMovilidad;
-import com.Cibertec.CattleFyApi.models.RegistroMuerte;
-import com.Cibertec.CattleFyApi.models.RegistroPeso;
-import com.Cibertec.CattleFyApi.models.RegistroSanitario;
-import com.Cibertec.CattleFyApi.repository.IAnimalRepository;
-import com.Cibertec.CattleFyApi.repository.IEspecieRepository;
-import com.Cibertec.CattleFyApi.repository.ILoteRepository;
-import com.Cibertec.CattleFyApi.repository.IRegistroMovilidadRepository;
-import com.Cibertec.CattleFyApi.repository.IRegistroMuerteRepository;
-import com.Cibertec.CattleFyApi.repository.IRegistroPesoRepository;
-import com.Cibertec.CattleFyApi.repository.IRegistroSanitarioRepository;
 import com.Cibertec.CattleFyApi.util.GeneradorQRS;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -67,15 +56,16 @@ public class AnimalService {
     
     @Autowired
     private IRegistroSanitarioRepository sanitarioRepository;
-    
+
+    @Autowired
+    private IRegistroCompraRepository registroCompraRepository;
+
 
 
 	public Long totalAnimalesVivos(Integer granjaId) {
 		Long animalesV = animalRepository.contarAnimalesVivos(granjaId);
 		return animalesV;
 	}
-
-    // AL VENDER CAMBIAR EL ESTADO DEL LOTE A CERRADO
 
     @Transactional
     public AnimalResponse registrarAnimal(AnimalRequest req) {
@@ -114,6 +104,8 @@ public class AnimalService {
             animal.setPrecioCompra(BigDecimal.ZERO);
             animal.setMadre(madreAsignada);
 
+            animal.setCodigoQr(generadorQRS.generarCodigoQrAnimal(madreAsignada.getEspecie().getNombre()));
+
             if (req.getFechaNacimiento() == null) {
                 throw new IllegalArgumentException("La fecha de nacimiento es obligatoria para origen 'Nacimiento'.");
             }
@@ -133,6 +125,11 @@ public class AnimalService {
             if (req.getPrecioCompra() == null || req.getPrecioCompra() < 0) {
                 throw new IllegalArgumentException("El precio de compra es obligatorio y debe ser mayor o igual a 0 para origen 'Compra'.");
             }
+
+            if (req.getProveedor() == null || req.getProveedor().trim().isEmpty()) {
+                throw new IllegalArgumentException("El proveedor es obligatorio para origen 'Compra'.");
+            }
+
             animal.setPrecioCompra(new BigDecimal(req.getPrecioCompra()));
 
         } else {
@@ -144,7 +141,10 @@ public class AnimalService {
             throw new IllegalArgumentException("El lote '" + loteAsignado.getNombre() + "' ha alcanzado su capacidad máxima (" + loteAsignado.getCapacidadMax() + " animales).");
         }
 
-        animal.setCodigoQr(generadorQRS.generarCodigoQrAnimal());
+        Especie especie = especieRepository.findById(req.getIdEspecie()).orElseThrow(() ->
+                new EntityNotFoundException("No se hallo el id de de especie" + req.getIdEspecie()));
+
+        animal.setCodigoQr(generadorQRS.generarCodigoQrAnimal(especie.getNombre()));
         animal.setLote(loteAsignado);
         animal.setEspecie(especieAsignada);
         animal.setOrigen(req.getOrigen());
@@ -154,7 +154,7 @@ public class AnimalService {
         animal.setPeso(BigDecimal.valueOf(req.getPeso()));
         animal.setEstado("Vivo");
 
-        
+
         if (req.getImagen() == null || req.getImagen().isEmpty()) {
             throw new IllegalArgumentException("La imagen del animal es obligatoria.");
         }
@@ -167,6 +167,20 @@ public class AnimalService {
 
         Animal nuevoAnimal = animalRepository.save(animal);
         log.info("Animal registrado exitosamente con ID: {} y QR: {}", nuevoAnimal.getAnimalId(), nuevoAnimal.getCodigoQr());
+
+        // Si el origen es Compra, registrar en la tabla registro_compra
+        if ("Compra".equalsIgnoreCase(req.getOrigen())) {
+            RegistroCompra registroCompra = new RegistroCompra();
+            registroCompra.setLote(loteAsignado);
+            registroCompra.setProveedorNombre(req.getProveedor());
+            registroCompra.setFechaCompra(LocalDateTime.now());
+            registroCompra.setCantidadAnimales(1);
+            registroCompra.setCostoTotal(new BigDecimal(req.getPrecioCompra()));
+            registroCompra.setObservaciones("Ninguna");
+
+            registroCompraRepository.save(registroCompra);
+            log.info("Registro de compra creado exitosamente para el animal ID: {}", nuevoAnimal.getAnimalId());
+        }
 
         return convertToDto(nuevoAnimal);
     }
