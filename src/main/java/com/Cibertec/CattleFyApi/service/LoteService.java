@@ -1,12 +1,9 @@
 package com.Cibertec.CattleFyApi.service;
 
 import com.Cibertec.CattleFyApi.dto.*;
+import com.Cibertec.CattleFyApi.models.Animal;
 import com.Cibertec.CattleFyApi.models.Lote;
-import com.Cibertec.CattleFyApi.repository.IAnimalRepository;
-import com.Cibertec.CattleFyApi.repository.ICategoriaManejoRepository;
-import com.Cibertec.CattleFyApi.repository.IEspecieRepository;
-import com.Cibertec.CattleFyApi.repository.IGranjaRepository;
-import com.Cibertec.CattleFyApi.repository.ILoteRepository;
+import com.Cibertec.CattleFyApi.repository.*;
 import com.Cibertec.CattleFyApi.util.GeneradorQRS;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -39,6 +36,9 @@ public class LoteService {
 
     @Autowired
     private IGranjaRepository granjaRepository;
+
+    @Autowired
+    private IRegistroMuerteRepository registroMuerteRepository;
 
     public List<LoteListadoDTO> list(){
         List<Lote> lotes = loteRepository.findAll();
@@ -158,4 +158,84 @@ public class LoteService {
     public List<LoteSimpleDTO> obtenerLorePorGranja(Integer granjaId){
         return loteRepository.listaLotePorGranja(granjaId);
     }
+    public LoteDetalleResponse obtenerLoteDetalle(Integer loteId) {
+        Lote lote = loteRepository.findById(loteId)
+                .orElseThrow(() -> new RuntimeException("Lote no encontrado"));
+
+        return convertToDetalleDto(lote);
+    }
+
+    private LoteDetalleResponse convertToDetalleDto(Lote lote) {
+        LoteDetalleResponse dto = new LoteDetalleResponse();
+        // Información básica
+        dto.setLoteId(lote.getLoteId());
+        dto.setNombre(lote.getNombre());
+        dto.setCodigo(lote.getCodigoQr());
+        dto.setNumeroLote(lote.getLoteId().toString());
+        dto.setEstado(lote.getEstado());
+        dto.setTipoLote(lote.getCategoria().getTipoLote());
+
+        // Información de la granja
+        if (lote.getGranja() != null) {
+            dto.setGranjaNombre(lote.getGranja().getNombre());
+            dto.setGranjaId(lote.getGranja().getGranjaId());
+        }
+
+        // Información de la especie
+        if (lote.getEspecie() != null) {
+            dto.setEspecieNombre(lote.getEspecie().getNombre());
+            dto.setEspecieId(lote.getEspecie().getEspecieId());
+        }
+
+        // Cantidades y fechas
+        dto.setCantidadInicial(lote.getCapacidadMax());
+        dto.setCantidadActual(lote.getCapacidadMax());
+        dto.setFechaInicio(lote.getFechaCreacion());
+
+        // Métricas clave
+        dto.setPesoPromedio(calcularPesoPromedio(lote));
+        dto.setPesoTotal(calcularPesoTotal(lote));
+        dto.setPrecioEstimado(calcularPrecioEstimado(lote));
+
+        // Contadores de historiales
+        dto.setCantidadRegistrosBajas(contarBajas(lote.getLoteId()));
+
+        return dto;
+    }
+
+    // Métodos auxiliares para calcular métricas
+    private Double calcularPesoPromedio(Lote lote) {
+        List<Animal> animales = animalRepository.findByLoteAndEstado(lote, "Vivo");
+
+        if (animales.isEmpty()) {
+            return 0.0;
+        }
+
+        double totalPeso = animales.stream()
+                .map(a -> a.getPeso() != null ? a.getPeso().doubleValue() : 0.0)
+                .mapToDouble(Double::doubleValue)
+                .sum();
+
+        return totalPeso / animales.size();
+    }
+
+
+    private Double calcularPesoTotal(Lote lote) {
+        List<Animal> animales = animalRepository.findByLoteAndEstado(lote, "Vivo");
+
+        return animales.stream()
+                .map(a -> a.getPeso() != null ? a.getPeso().doubleValue() : 0.0)
+                .mapToDouble(Double::doubleValue)
+                .sum();
+    }
+
+    private Double calcularPrecioEstimado(Lote lote) {
+        double precioKg = 13.0; // ejemplo referencia
+        return calcularPesoTotal(lote) * precioKg;
+    }
+
+    private Integer contarBajas(Integer loteId) {
+        return registroMuerteRepository.countByLote_LoteId(loteId);
+    }
+
 }

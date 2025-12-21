@@ -34,6 +34,27 @@ public class LotesController {
         );
     }
 
+    @GetMapping("obtenerDetalle/{id}")
+    public ResponseEntity<ResultadoResponse<LoteDetalleResponse>> obtenerLoteDetalle(@PathVariable Integer id) {
+        try {
+            LoteDetalleResponse lote = lotesService.obtenerLoteDetalle(id);
+
+            if (lote == null) {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body(ResultadoResponse.error("Lote no encontrado."));
+            }
+
+            return ResponseEntity.ok(
+                    ResultadoResponse.success("Lote obtenido exitosamente.", lote));
+
+        } catch (Exception e) {
+            return ResponseEntity
+                    .internalServerError()
+                    .body(ResultadoResponse.error("Error interno al obtener el lote: " + e.getMessage()));
+        }
+    }
+
     @GetMapping("/listFiltro")
     public ResponseEntity<ResultadoResponse<List<LoteResponse>>> listarLotes(
             @RequestParam(required = false) Integer granjaId,
