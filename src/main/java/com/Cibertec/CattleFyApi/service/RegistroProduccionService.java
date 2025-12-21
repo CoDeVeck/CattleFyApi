@@ -22,9 +22,23 @@ public class RegistroProduccionService {
     private final IRegistroProduccionRepository registroProduccionRepository;
     private final ILoteRepository loteRepository;
 
-    public List<RegistroProduccion> getAll(){
-        return registroProduccionRepository.findAll();
+    public List<RegistroProduccionDTO> listarProduccionPorLote(Integer loteId) {
+
+        List<RegistroProduccion> registros = registroProduccionRepository.findByLote_LoteId(loteId);
+
+        return registros.stream()
+                .map(entidad -> RegistroProduccionDTO.builder()
+                        .produccionId(entidad.getProduccionId())
+                        .fechaRegistro(entidad.getFechaRegistro())
+                        .tipoProduccion(entidad.getTipoProduccion())
+                        .cantidad(entidad.getCantidad())
+                        .loteId(entidad.getLote().getLoteId())
+                        .nombreLote(entidad.getLote().getNombre())
+                        .build()
+                )
+                .toList();
     }
+
 
     @Transactional
     public ResultadoResponse<RegistroProduccionResponse> registrarProduccion(RegistroProduccionRequest req) {

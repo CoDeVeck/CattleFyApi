@@ -28,10 +28,10 @@ public class RegistroSanitarioControler {
         }
     }
 
-    @GetMapping("/listarHistorial")
-    public ResponseEntity<ResultadoResponse<RegistroSanitarioListResponse>> listarTodos() {
+    @GetMapping("/listarHistorial/{loteId}")
+    public ResponseEntity<ResultadoResponse<RegistroSanitarioListResponse>> listarTodos(@PathVariable Integer loteId) {
         ResultadoResponse<RegistroSanitarioListResponse> response =
-                registroSanitarioService.listarTodos();
+                registroSanitarioService.listarTodos(loteId);
 
         if (response.isValor()) {
             return ResponseEntity.ok(response);
