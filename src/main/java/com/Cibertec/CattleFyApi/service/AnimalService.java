@@ -67,123 +67,123 @@ public class AnimalService {
 		return animalesV;
 	}
 
-    @Transactional
-    public AnimalResponse registrarAnimal(AnimalRequest req) {
-        Animal animal = new Animal();
-        Lote loteAsignado;
-        Animal madreAsignada = new Animal();
-        Especie especieAsignada;
+	@Transactional
+	public AnimalResponse registrarAnimal(AnimalRequest req) {
+	    Animal animal = new Animal();
+	    Lote loteAsignado;
+	    Animal madreAsignada = new Animal();
+	    Especie especieAsignada;
 
-        if ("Nacimiento".equalsIgnoreCase(req.getOrigen())) {
+	    if ("Nacimiento".equalsIgnoreCase(req.getOrigen())) {
 
-            if (req.getCodigoQrMadre() == null || req.getCodigoQrMadre().isEmpty()) {
-                throw new IllegalArgumentException("El código QR de la madre es obligatorio para origen 'Nacimiento'.");
-            }
+	        if (req.getCodigoQrMadre() == null || req.getCodigoQrMadre().isEmpty()) {
+	            throw new IllegalArgumentException("El código QR de la madre es obligatorio para origen 'Nacimiento'.");
+	        }
 
-            madreAsignada = animalRepository.findByCodigoQr(req.getCodigoQrMadre())
-                    .orElseThrow(() -> new EntityNotFoundException("Animal madre no encontrado con QR: " + req.getCodigoQrMadre()));
+	        madreAsignada = animalRepository.findByCodigoQr(req.getCodigoQrMadre())
+	                .orElseThrow(() -> new EntityNotFoundException("Animal madre no encontrado con QR: " + req.getCodigoQrMadre()));
 
-            if (!"Vivo".equalsIgnoreCase(madreAsignada.getEstado())) {
-                throw new IllegalArgumentException("La madre debe estar en estado 'Vivo' para registrar una cría.");
-            }
+	        if (!"Vivo".equalsIgnoreCase(madreAsignada.getEstado())) {
+	            throw new IllegalArgumentException("La madre debe estar en estado 'Vivo' para registrar una cría.");
+	        }
 
-            if (!"H".equalsIgnoreCase(madreAsignada.getSexo())) {
-                throw new IllegalArgumentException("El animal madre debe ser hembra (sexo 'H').");
-            }
+	        if (!"H".equalsIgnoreCase(madreAsignada.getSexo())) {
+	            throw new IllegalArgumentException("El animal madre debe ser hembra (sexo 'H').");
+	        }
 
-            loteAsignado = madreAsignada.getLote();
-            log.info("Lote heredado de la madre: {} (ID: {})", loteAsignado.getNombre(), loteAsignado.getLoteId());
+	        loteAsignado = madreAsignada.getLote();
+	        log.info("Lote heredado de la madre: {} (ID: {})", loteAsignado.getNombre(), loteAsignado.getLoteId());
 
-            especieAsignada = madreAsignada.getEspecie();
-            log.info("Especie heredada: {} (ID: {})", especieAsignada.getNombre(), especieAsignada.getEspecieId());
+	        especieAsignada = madreAsignada.getEspecie();
+	        log.info("Especie heredada: {} (ID: {})", especieAsignada.getNombre(), especieAsignada.getEspecieId());
 
-            log.info("Categoría de manejo heredada del lote: {} (ID: {})",
-                    loteAsignado.getCategoria().getNombre(),
-                    loteAsignado.getCategoria().getCategoriaId());
+	        log.info("Categoría de manejo heredada del lote: {} (ID: {})",
+	                loteAsignado.getCategoria().getNombre(),
+	                loteAsignado.getCategoria().getCategoriaId());
 
-            animal.setPrecioCompra(BigDecimal.ZERO);
-            animal.setMadre(madreAsignada);
+	        animal.setPrecioCompra(BigDecimal.ZERO);
+	        animal.setMadre(madreAsignada);
 
-            animal.setCodigoQr(generadorQRS.generarCodigoQrAnimal(madreAsignada.getEspecie().getNombre()));
+	        animal.setCodigoQr(generadorQRS.generarCodigoQrAnimal(madreAsignada.getEspecie().getNombre()));
 
-            if (req.getFechaNacimiento() == null) {
-                throw new IllegalArgumentException("La fecha de nacimiento es obligatoria para origen 'Nacimiento'.");
-            }
+	        if (req.getFechaNacimiento() == null) {
+	            throw new IllegalArgumentException("La fecha de nacimiento es obligatoria para origen 'Nacimiento'.");
+	        }
 
-        } else if ("Compra".equalsIgnoreCase(req.getOrigen())) {
+	    } else if ("Compra".equalsIgnoreCase(req.getOrigen())) {
 
-            loteAsignado = loteRepository.findById(req.getIdLote())
-                    .orElseThrow(() -> new EntityNotFoundException("Lote no encontrado con ID: " + req.getIdLote()));
+	        loteAsignado = loteRepository.findById(req.getIdLote())
+	                .orElseThrow(() -> new EntityNotFoundException("Lote no encontrado con ID: " + req.getIdLote()));
 
-            especieAsignada = especieRepository.findById(req.getIdEspecie())
-                    .orElseThrow(() -> new EntityNotFoundException("Especie no encontrada con ID: " + req.getIdEspecie()));
+	        especieAsignada = especieRepository.findById(req.getIdEspecie())
+	                .orElseThrow(() -> new EntityNotFoundException("Especie no encontrada con ID: " + req.getIdEspecie()));
 
-            if (!loteAsignado.getEspecie().getEspecieId().equals(especieAsignada.getEspecieId())) {
-                throw new IllegalArgumentException("La especie seleccionada no coincide con la especie del lote.");
-            }
+	        if (!loteAsignado.getEspecie().getEspecieId().equals(especieAsignada.getEspecieId())) {
+	            throw new IllegalArgumentException("La especie seleccionada no coincide con la especie del lote.");
+	        }
 
-            if (req.getPrecioCompra() == null || req.getPrecioCompra() < 0) {
-                throw new IllegalArgumentException("El precio de compra es obligatorio y debe ser mayor o igual a 0 para origen 'Compra'.");
-            }
+	        if (req.getPrecioCompra() == null || req.getPrecioCompra() < 0) {
+	            throw new IllegalArgumentException("El precio de compra es obligatorio y debe ser mayor o igual a 0 para origen 'Compra'.");
+	        }
 
-            if (req.getProveedor() == null || req.getProveedor().trim().isEmpty()) {
-                throw new IllegalArgumentException("El proveedor es obligatorio para origen 'Compra'.");
-            }
+	        if (req.getProveedor() == null || req.getProveedor().trim().isEmpty()) {
+	            throw new IllegalArgumentException("El proveedor es obligatorio para origen 'Compra'.");
+	        }
 
-            animal.setPrecioCompra(new BigDecimal(req.getPrecioCompra()));
+	        animal.setPrecioCompra(new BigDecimal(req.getPrecioCompra()));
+	        animal.setCodigoQr(generadorQRS.generarCodigoQrAnimal(especieAsignada.getNombre()));
 
-        } else {
-            throw new IllegalArgumentException("El origen debe ser 'Nacimiento' o 'Compra'.");
-        }
+	    } else {
+	        throw new IllegalArgumentException("El origen debe ser 'Nacimiento' o 'Compra'.");
+	    }
 
-        Long animalesVivosEnLote = animalRepository.contarAnimalesVivosPorLote(loteAsignado.getLoteId());
-        if (animalesVivosEnLote >= loteAsignado.getCapacidadMax()) {
-            throw new IllegalArgumentException("El lote '" + loteAsignado.getNombre() + "' ha alcanzado su capacidad máxima (" + loteAsignado.getCapacidadMax() + " animales).");
-        }
+	    // Validación de capacidad del lote
+	    Long animalesVivosEnLote = animalRepository.contarAnimalesVivosPorLote(loteAsignado.getLoteId());
+	    if (animalesVivosEnLote >= loteAsignado.getCapacidadMax()) {
+	        throw new IllegalArgumentException("El lote '" + loteAsignado.getNombre() + "' ha alcanzado su capacidad máxima (" + loteAsignado.getCapacidadMax() + " animales).");
+	    }
 
-        Especie especie = especieRepository.findById(req.getIdEspecie()).orElseThrow(() ->
-                new EntityNotFoundException("No se hallo el id de de especie" + req.getIdEspecie()));
+	    // Setear propiedades comunes del animal
+	    animal.setLote(loteAsignado);
+	    animal.setEspecie(especieAsignada);
+	    animal.setOrigen(req.getOrigen());
+	    animal.setFechaIngreso(LocalDateTime.now());
+	    animal.setFechaNacimiento(req.getFechaNacimiento());
+	    animal.setSexo(req.getSexo());
+	    animal.setPeso(BigDecimal.valueOf(req.getPeso()));
+	    animal.setEstado("Vivo");
 
-        animal.setCodigoQr(generadorQRS.generarCodigoQrAnimal(especie.getNombre()));
-        animal.setLote(loteAsignado);
-        animal.setEspecie(especieAsignada);
-        animal.setOrigen(req.getOrigen());
-        animal.setFechaIngreso(LocalDateTime.now());
-        animal.setFechaNacimiento(req.getFechaNacimiento());
-        animal.setSexo(req.getSexo());
-        animal.setPeso(BigDecimal.valueOf(req.getPeso()));
-        animal.setEstado("Vivo");
+	    // Validar y subir imagen
+	    if (req.getImagen() == null || req.getImagen().isEmpty()) {
+	        throw new IllegalArgumentException("La imagen del animal es obligatoria.");
+	    }
 
+	    log.info("Subiendo imagen a Cloudinary...");
+	    String carpeta = obtenerCarpetaPorEspecie(especieAsignada.getEspecieId());
+	    String imagenUrl = cloudinaryService.uploadImage(req.getImagen(), carpeta);
+	    animal.setFotoUrl(imagenUrl);
+	    log.info("Imagen subida exitosamente: {}", imagenUrl);
 
-        if (req.getImagen() == null || req.getImagen().isEmpty()) {
-            throw new IllegalArgumentException("La imagen del animal es obligatoria.");
-        }
+	    // Guardar animal
+	    Animal nuevoAnimal = animalRepository.save(animal);
+	    log.info("Animal registrado exitosamente con ID: {} y QR: {}", nuevoAnimal.getAnimalId(), nuevoAnimal.getCodigoQr());
 
-        log.info("Subiendo imagen a Cloudinary...");
-        String carpeta = obtenerCarpetaPorEspecie(especieAsignada.getEspecieId());
-        String imagenUrl = cloudinaryService.uploadImage(req.getImagen(), carpeta);
-        animal.setFotoUrl(imagenUrl);
-        log.info("Imagen subida exitosamente: {}", imagenUrl);
+	    // Si el origen es Compra, registrar en la tabla registro_compra
+	    if ("Compra".equalsIgnoreCase(req.getOrigen())) {
+	        RegistroCompra registroCompra = new RegistroCompra();
+	        registroCompra.setLote(loteAsignado);
+	        registroCompra.setProveedorNombre(req.getProveedor());
+	        registroCompra.setFechaCompra(LocalDateTime.now());
+	        registroCompra.setCantidadAnimales(1);
+	        registroCompra.setCostoTotal(new BigDecimal(req.getPrecioCompra()));
+	        registroCompra.setObservaciones("Ninguna");
 
-        Animal nuevoAnimal = animalRepository.save(animal);
-        log.info("Animal registrado exitosamente con ID: {} y QR: {}", nuevoAnimal.getAnimalId(), nuevoAnimal.getCodigoQr());
+	        registroCompraRepository.save(registroCompra);
+	        log.info("Registro de compra creado exitosamente para el animal ID: {}", nuevoAnimal.getAnimalId());
+	    }
 
-        // Si el origen es Compra, registrar en la tabla registro_compra
-        if ("Compra".equalsIgnoreCase(req.getOrigen())) {
-            RegistroCompra registroCompra = new RegistroCompra();
-            registroCompra.setLote(loteAsignado);
-            registroCompra.setProveedorNombre(req.getProveedor());
-            registroCompra.setFechaCompra(LocalDateTime.now());
-            registroCompra.setCantidadAnimales(1);
-            registroCompra.setCostoTotal(new BigDecimal(req.getPrecioCompra()));
-            registroCompra.setObservaciones("Ninguna");
-
-            registroCompraRepository.save(registroCompra);
-            log.info("Registro de compra creado exitosamente para el animal ID: {}", nuevoAnimal.getAnimalId());
-        }
-
-        return convertToDto(nuevoAnimal);
-    }
+	    return convertToDto(nuevoAnimal);
+	}
 
 	public List<AnimalResponse> listarAnimalesPorLote(Integer loteId) {
 		List<Animal> animales = animalRepository.findByLote_LoteIdAndEstado(loteId, "Vivo");
