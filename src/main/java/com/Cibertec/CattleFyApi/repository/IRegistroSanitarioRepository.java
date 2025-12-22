@@ -13,7 +13,8 @@ import com.Cibertec.CattleFyApi.models.RegistroSanitario;
 public interface IRegistroSanitarioRepository extends JpaRepository<RegistroSanitario, Integer>{
 
     List<RegistroSanitario> findByAnimal_AnimalId(Integer AnimalId);
-    
+    List<RegistroSanitario> findByLote_LoteId(Integer loteId);
+
     @Query("SELECT COALESCE(SUM(s.costoPorDosis * s.cantidadDosis), 0) " +
             "FROM RegistroSanitario s " +
             "WHERE s.lote.loteId = :loteId")

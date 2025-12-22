@@ -57,9 +57,9 @@ public class RegistroAlimentacionService {
     }
 
 
-    public List<RegistrarAlimentacionHistorialDTO> listarHistorialAlimentacion() {
+    public List<RegistrarAlimentacionHistorialDTO> listarHistorialAlimentacion(Integer loteId) {
 
-        List<RegistroAlimentacion> registros = registroAlimentacionRepository.findAll();
+        List<RegistroAlimentacion> registros = registroAlimentacionRepository.findByLote_LoteId(loteId);
 
         return registros.stream()
                 .map(entidad -> {

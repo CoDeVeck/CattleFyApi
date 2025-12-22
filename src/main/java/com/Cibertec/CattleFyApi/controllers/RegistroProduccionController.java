@@ -20,9 +20,9 @@ public class RegistroProduccionController {
     private final RegistroProduccionService registroProduccionService;
     private final LoteService loteService;
 
-    @GetMapping("/listHistorial")
-    public ResponseEntity<List<RegistroProduccion>> listHistorial(){
-        List<RegistroProduccion> resultado = registroProduccionService.getAll();
+    @GetMapping("/listHistorial/{loteId}")
+    public ResponseEntity<List<RegistroProduccionDTO>> listHistorial(@PathVariable Integer loteId){
+        List<RegistroProduccionDTO> resultado = registroProduccionService.listarProduccionPorLote(loteId);
         if(!resultado.isEmpty()){
             return new ResponseEntity<>(resultado, HttpStatus.OK);
         }

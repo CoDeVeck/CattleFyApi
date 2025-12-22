@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.time.LocalDate;
 import java.util.List;
 public interface IRegistroProduccionRepository  extends JpaRepository<RegistroProduccion, Integer>{
+    List<RegistroProduccion> findByLote_LoteId(Integer loteId);
 
     //REPORTE PRODUCCION
 

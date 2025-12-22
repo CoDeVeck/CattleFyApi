@@ -88,21 +88,21 @@ public class RegistroSanitarioService {
     }
 
     @Transactional(readOnly = true)
-    public ResultadoResponse<RegistroSanitarioListResponse> listarTodos() {
+    public ResultadoResponse<RegistroSanitarioListResponse> listarTodos(Integer loteId) {
         try {
-            List<RegistroSanitario> registros = registroSanitarioRepository.findAll();
+            List<RegistroSanitario> registros = registroSanitarioRepository.findByLote_LoteId(loteId);
 
             List<RegistroSanitarioResponse> listaDto = registros.stream()
                     .map(this::mapToResponse)
                     .toList();
 
             return ResultadoResponse.success(
-                    "Listado de registros sanitarios",
+                    "Listado de registros sanitarios por lote",
                     new RegistroSanitarioListResponse(listaDto)
             );
 
         } catch (Exception e) {
-            return ResultadoResponse.error("Ocurrió un error al listar los registros: " + e.getMessage());
+            return ResultadoResponse.error("Error al listar los registros por lote: " + e.getMessage());
         }
     }
 
