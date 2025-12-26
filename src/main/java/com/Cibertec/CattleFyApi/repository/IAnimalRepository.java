@@ -16,6 +16,13 @@ public interface IAnimalRepository extends JpaRepository<Animal, Integer>{
     Integer contarAnimalesPorLote(@Param("loteId") Integer loteId);
 
     @Query("""
+        SELECT COUNT(a) FROM Animal a 
+        JOIN a.lote l WHERE l.granja.granjaId = :granjaId 
+        AND a.estado = 'Vivo'
+    """)
+    Long contarAnimalesActivos(@Param("granjaId") Long granjaId);
+
+    @Query("""
 			
 			SELECT COUNT(a) FROM Animal a
 			WHERE a.estado = 'Vendido' AND

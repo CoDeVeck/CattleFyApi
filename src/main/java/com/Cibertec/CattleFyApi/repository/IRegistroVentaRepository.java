@@ -11,7 +11,19 @@ import org.springframework.data.repository.query.Param;
 import com.Cibertec.CattleFyApi.models.RegistroVenta;
 
 public interface IRegistroVentaRepository  extends JpaRepository<RegistroVenta, Integer>{
-	
+	@Query("""
+        SELECT COALESCE(SUM(v.precioTotal), 0) 
+        FROM RegistroVenta v 
+        WHERE v.lote.granja.granjaId = :granjaId 
+        AND v.fechaVenta >= :inicioMes 
+        AND v.fechaVenta < :finMes
+    """)
+	BigDecimal sumarVentasDelMes(
+			@Param("granjaId") Long granjaId,
+			@Param("inicioMes") LocalDateTime inicioMes,
+			@Param("finMes") LocalDateTime finMes
+	);
+
 	@Query("""
 		    SELECT COALESCE(SUM(v.precioTotal), 0)
 		    FROM RegistroVenta v

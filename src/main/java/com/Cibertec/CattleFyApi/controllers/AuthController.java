@@ -91,4 +91,14 @@ public class AuthController {
                     .body(ResultadoResponse.error(e.getMessage()));
         }
     }
+
+
+    @GetMapping("/contadores/{granjaId}")
+    public ResponseEntity<DashboardContadoresDTO> obtenerContadores(
+            @PathVariable Long granjaId
+    ) {
+        DashboardContadoresDTO contadores = authService
+                .obtenerContadoresDashboard(granjaId);
+        return ResponseEntity.ok(contadores);
+    }
 }
