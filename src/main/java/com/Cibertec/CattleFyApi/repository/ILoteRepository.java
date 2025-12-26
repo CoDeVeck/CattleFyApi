@@ -14,6 +14,13 @@ import com.Cibertec.CattleFyApi.models.Lote;
 import org.springframework.web.bind.annotation.PathVariable;
 
 public interface ILoteRepository  extends JpaRepository<Lote, Integer>{
+    @Query("""
+        SELECT COUNT(l) 
+        FROM Lote l 
+        WHERE l.granja.granjaId = :granjaId 
+        AND l.estado = 'Activo'
+    """)
+    Long contarLotesActivos(@Param("granjaId") Long granjaId);
 
     @Query("""
             SELECT COUNT(l) FROM Lote l
