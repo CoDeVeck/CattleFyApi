@@ -285,6 +285,7 @@ public interface IRegistroProduccionRepository  extends JpaRepository<RegistroPr
 
     @Query(value = """
              SELECT
+                    rs.nombre_producto,
                     rs.protocolo_tipo,
                     rs.lote_id,
                     rs.animal_id,

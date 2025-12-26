@@ -1,8 +1,8 @@
 package com.Cibertec.CattleFyApi.service;
 
+import com.Cibertec.CattleFyApi.dto.DashboardContadoresDTO;
 import com.Cibertec.CattleFyApi.models.Rol;
-import com.Cibertec.CattleFyApi.repository.IRolRepository;
-import com.Cibertec.CattleFyApi.repository.IUsuarioRepository;
+import com.Cibertec.CattleFyApi.repository.*;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -15,13 +15,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final IUsuarioRepository usuarioRepository;
     private final IRolRepository rolRepository;
+    private final ILoteRepository loteRepository;
+    private final IAnimalRepository animalRepository;
+    private final IRegistroVentaRepository registroVentaRepository;
+    private final ITipoNotificacionRepository tipoNotificacionRepository;
     private final PasswordEncoder passwordEncoder;
     private final FirebaseTokenService firebaseTokenService;
     @Transactional
@@ -121,5 +129,31 @@ public class AuthService {
         usuario.setFcmToken(fcmToken);
         usuario.setFcmTokenFecha(LocalDateTime.now());
         usuarioRepository.save(usuario);
+    }
+
+    @Transactional(readOnly = true)
+    public DashboardContadoresDTO obtenerContadoresDashboard(Long granjaId) {
+        // Obtener el mes actual
+        YearMonth mesActual = YearMonth.now();
+        LocalDateTime inicioMes = mesActual.atDay(1).atStartOfDay();
+        LocalDateTime finMes = mesActual.plusMonths(1).atDay(1).atStartOfDay();
+
+        // Ejecutar las consultas
+        Long animalesActivos = animalRepository.contarAnimalesActivos(granjaId);
+        Long lotesActivos = loteRepository.contarLotesActivos(granjaId);
+        Long alertasCriticas = tipoNotificacionRepository.contarAlertasCriticas(granjaId);
+        BigDecimal ventasDelMes = registroVentaRepository.sumarVentasDelMes(
+                granjaId,
+                inicioMes,
+                finMes
+        );
+
+        // Construir y retornar el DTO
+        return new DashboardContadoresDTO(
+                animalesActivos,
+                lotesActivos,
+                alertasCriticas,
+                ventasDelMes != null ? ventasDelMes : BigDecimal.ZERO
+        );
     }
 }
