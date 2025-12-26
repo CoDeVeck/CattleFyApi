@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class AplicacionesRecientesDTO {
 
+    private String nombre_producto;
     private String protocolo_tipo;
     private Integer lote_id;
     private Integer animal_id;
